@@ -1,24 +1,15 @@
 
-# This is the user-interface definition of a Shiny web application.
 shinyUI(fluidPage(
-    headerPanel('this is a header'), 
+    titlePanel('日新增用户'), 
     
-    sidebarPanel(
-        selectInput('variable', 'Variable: ', 
-                    list('Cylinders' = 'cyl', 
-                         'Transmission' = 'am', 
-                         'Gears' = 'gear')), 
-        checkboxInput('outliers', 'Show outliers', FALSE), 
+    sidebarLayout(
         
-        sliderInput('test_slider_input', 'Test_Slider', 
-                    min = 0, max = 100, value = c(25, 75))
-    ), 
-    
-    mainPanel(
-        h3(textOutput('caption')), 
+        sidebarPanel(
+            sliderInput('days', '时间范围：', min = 3, max = 90, value = 7)
+        ), 
         
-        plotOutput('mpgPlot'), 
-        
-        tableOutput('test_slider_output')
+        mainPanel(
+            plotOutput('daily_new')
+        )
     )
 ))

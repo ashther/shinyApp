@@ -2,17 +2,30 @@
 library(dplyr)
 library(maps)
 library(mapproj)
-source('test_US_census/helpers.R')
+source('e:/Git/shinyApp/test_US_census/helpers.R')
 counties <- readRDS('e:/Git/shinyApp/test_US_census/data/counties.rds')
 
 shinyServer(function(input, output) {
     
-    selected <- reactive({
-        counties[grepl(input$name, counties$name, fixed = TRUE), ] %>% 
-            head()
+    var_rea <- reactive({
+        switch(input$var,
+            'Percent White' = counties$white, 
+            'Percent Black' = counties$black, 
+            'Percent Hispanic' = counties$hispanic,
+            'Percent Asian' = counties$asian
+        )
     })
     
-    output$counties <- renderTable({
-        selected()
+    color_rea <- reactive({
+        switch(input$var,
+               'Percent White' = 'darkgreen', 
+               'Percent Black' = 'black', 
+               'Percent Hispanic' = 'darkorange',
+               'Percent Asian' = 'darkviolet'
+        )
+    })
+    
+    output$map <- renderPlot({
+        percent_map(var_rea(), color_rea(), input$var, input$range[1], input$range[2])
     })
 })

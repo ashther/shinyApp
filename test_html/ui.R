@@ -1,6 +1,6 @@
 
 shinyUI(fluidPage(
-    titlePanel("My Shiny App"),
+    titlePanel("我的Shiny App"),
     sidebarLayout(
         sidebarPanel(
             strong(p('Installation', style = 'font-size:160%')),  

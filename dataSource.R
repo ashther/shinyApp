@@ -1,7 +1,6 @@
 
 library(RMySQL)
 library(dplyr)
-library(ggplot2)
 
 host <- '10.21.3.101'
 port <- 3306
@@ -84,6 +83,7 @@ temp_hr$hour <- temp_hr$hour - 1
 hr <- data.frame(date_time = seq(from = min(hourly_login$date_time), 
                                  to = as.POSIXct(format(temp_hr, '%Y-%m-%d %H:00:00')), 
                                  by = 'hour'))
+rm(temp_hr)
 
 hourly_login <- left_join(hr, hourly_login, by = 'date_time') %>% 
     select(date_time, new, active, login)

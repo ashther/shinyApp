@@ -1,62 +1,68 @@
 
 library(shiny)
 library(shinydashboard)
+library(ggplot2)
 
 source('dataSource.R')
 
 ui <- dashboardPage(
   skin = 'black', 
   
-  dashboardHeader(title = 'Basic dashboard'), 
+  dashboardHeader(title = 'data analysis'), 
   
   dashboardSidebar(
-    sidebarSearchForm(textId = 'searchText', buttonId = 'searchButton', 
-                      label = 'search....'), 
-    # sidebarMenuOutput('menu')
+
     sidebarMenu(
-      menuItem('Dashboard', tabName = 'dashboard', icon = icon('dashboard')),
-      menuItem('Widgets', tabName = 'widgets', icon = icon('th'))
-      # menuItem('Source code', tabName = 'source', icon = icon('file-code-o'),
-      #          href = 'https://github.com/rstudio/shinydashboard/')
+      menuItem('Point', tabName = 'point', icon = icon('th')), 
+      menuItem('Login', tabName = 'login', icon = icon('dashboard')),
+      menuItem('Quick_chat', tabName = 'quick_chat', icon = icon('th'))
     )
   ),
   
   dashboardBody(
-    # tabItems(
-    #   tabItem(tabName = 'test', 
-    #           h2('it is a test'))
-    # )
+      
     tabItems(
+      tabItem(
+          tabName = 'point', 
+          fluidRow(
+              valueBoxOutput('total_user'), 
+              valueBoxOutput('new_user_today'), 
+              valueBoxOutput('active_user_today')
+          )  
+      ), 
 
-      tabItem(tabName = 'dashboard',
-              fluidRow(
-                column(width = 12, 
-                       box(plotOutput('plot1'), width = NULL, solidHeader = TRUE),
-                       
-                       box(title = 'Controls', width = NULL, solidHeader = TRUE, 
-                           sliderInput('slider', 'Number of observations: ', 1, 100, 50)))
-              )),
+      tabItem(
+          tabName = 'login',
+           
+          fluidRow(
+            box(plotOutput('plot1'), width = 7, solidHeader = TRUE)  
+          )
+      ),
 
-      tabItem(tabName = 'widgets',
-              h2('Widgets tab content'))
-
+      tabItem(
+          tabName = 'quick_chat',
+          h2('quick_chat')
+      )
     )
   )
 )
 
 server <- function(input, output) {
-  set.seed(122)
-  histdata <- rnorm(500)
-
-  output$plot1 <- renderPlot({
-    data <- histdata[seq_len(input$slider)]
-    hist(data)
-  })
-  # output$menu <- renderMenu({
-  #   sidebarMenu(
-  #     menuItem('Menu Item', tabName = 'test', icon = icon('calendar'))
-  #   )
-  # })
+    output$total_user <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'total_user'], 'total user')
+    })
+    
+    output$new_user_today <- renderValueBox({
+        valueBox(daily_login$new[daily_login$date_time == (Sys.Date() - 1)], 'new user')
+    })
+    
+    output$active_user_today <- renderValueBox({
+        valueBox(daily_login$active[daily_login$date_time == (Sys.Date() - 1)], 'active user')
+    })
+    
+    output$plot1 <- renderPlot({
+        ggplot(daily_login, aes(date_time, new)) + geom_bar(stat = 'identity')
+    })
 }
 
 shinyApp(ui, server)

@@ -33,7 +33,8 @@ ui <- dashboardPage(
           fluidRow(
               valueBoxOutput('total_user'), 
               valueBoxOutput('new_user_today'), 
-              valueBoxOutput('active_user_today')
+              valueBoxOutput('active_user_today'), 
+              valueBoxOutput('login_times_today')
           ), 
           
           # 第二行，历史用户数据
@@ -114,6 +115,10 @@ server <- function(input, output) {
     
     output$active_user_today <- renderValueBox({
         valueBox(daily_login$active[daily_login$date_time == (Sys.Date() - 1)], 'active user')
+    })
+    
+    output$login_times_today <- renderValueBox({
+        valueBox()
     })
     
     output$plot_login <- renderPlot({

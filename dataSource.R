@@ -79,7 +79,7 @@ monthly_login$first_monthday <- strptime(paste0(monthly_login$year_month_id, '-0
 # =============================================================================
 
 dt <- data.frame(date_time = seq(from = min(daily_login$date_time),
-                                 to = Sys.Date(), 
+                                 to = Sys.Date() - 1, 
                                  by = 'day'))
 
 daily_login <- left_join(dt, daily_login, by = 'date_time') %>%
@@ -102,19 +102,20 @@ hourly_login[is.na(hourly_login)] <- 0
 # =============================================================================
 
 wk <- data.frame(first_weekday = seq(from = min(weekly_login$first_weekday),
-                                     to = Sys.Date(),
+                                     to = Sys.Date() - 7,
                                      by = 'week')) %>% 
-    mutate(year_week = paste0(format(Sys.time(), '%Y'), '-', format(first_weekday, '%V')))
+    mutate(year_week = paste0(format(first_weekday, '%Y'), '-', format(first_weekday, '%V')))
 weekly_login <- left_join(wk, weekly_login, c('first_weekday', 'year_week')) %>% 
     select(first_weekday, year_week, new, active, login)
 weekly_login[is.na(weekly_login)] <- 0
 
 # =============================================================================
 
+# temp_mt_to <- Sys.Date() - as.POSIXlt(Sys.Date())$mday - 1
 mt <- data.frame(first_monthday = seq(from = min(monthly_login$first_monthday), 
                                       to = Sys.Date(), 
                                       by = 'month')) %>% 
-    mutate(year_month_id = paste0(format(Sys.time(), '%Y'), '-', format(first_monthday, '%m')))
+    mutate(year_month_id = paste0(format(first_monthday, '%Y'), '-', format(first_monthday, '%m')))
 monthly_login <- left_join(mt, monthly_login, c('first_monthday', 'year_month_id')) %>% 
     select(first_monthday, year_month_id, new, active, login)
 monthly_login[is.na(monthly_login)] <- 0

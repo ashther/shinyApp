@@ -49,19 +49,19 @@ while (dbMoreResults(con)) {
 }
 dbClearResult(res)
 
-res <- dbSendQuery(con, 'select * from daily.quick_chat;')
-daily_quick_chat <- dbFetch(res, n = -1)
-while (dbMoreResults(con)) {
-    dbNextResult(con)
-}
-dbClearResult(res)
-
-res <- dbSendQuery(con, 'select * from hourly.quick_chat;')
-hourly_quick_chat <- dbFetch(res, n = -1)
-while (dbMoreResults(con)) {
-    dbNextResult(con)
-}
-dbClearResult(res)
+# res <- dbSendQuery(con, 'select * from daily.quick_chat;')
+# daily_quick_chat <- dbFetch(res, n = -1)
+# while (dbMoreResults(con)) {
+#     dbNextResult(con)
+# }
+# dbClearResult(res)
+# 
+# res <- dbSendQuery(con, 'select * from hourly.quick_chat;')
+# hourly_quick_chat <- dbFetch(res, n = -1)
+# while (dbMoreResults(con)) {
+#     dbNextResult(con)
+# }
+# dbClearResult(res)
 
 dbDisconnect(con)
 
@@ -83,7 +83,7 @@ dt <- data.frame(date_time = seq(from = min(daily_login$date_time),
                                  by = 'day'))
 
 daily_login <- left_join(dt, daily_login, by = 'date_time') %>%
-    select(date_time, new, active, login, retention)
+    select(date_time, new = NEW, active, login, retention, contains('freq'))
 daily_login[is.na(daily_login)] <- 0
 
 # =============================================================================
@@ -106,7 +106,7 @@ wk <- data.frame(first_weekday = seq(from = min(weekly_login$first_weekday),
                                      by = 'week')) %>% 
     mutate(year_week = paste0(format(first_weekday, '%Y'), '-', format(first_weekday, '%V')))
 weekly_login <- left_join(wk, weekly_login, c('first_weekday', 'year_week')) %>% 
-    select(first_weekday, year_week, new, active, login)
+    select(date_time = first_weekday, year_week, new = NEW, active, login, retention)
 weekly_login[is.na(weekly_login)] <- 0
 
 # =============================================================================
@@ -117,7 +117,7 @@ mt <- data.frame(first_monthday = seq(from = min(monthly_login$first_monthday),
                                       by = 'month')) %>% 
     mutate(year_month_id = paste0(format(first_monthday, '%Y'), '-', format(first_monthday, '%m')))
 monthly_login <- left_join(mt, monthly_login, c('first_monthday', 'year_month_id')) %>% 
-    select(first_monthday, year_month_id, new, active, login)
+    select(date_time = first_monthday, year_month_id, new = NEW, active, login, retention)
 monthly_login[is.na(monthly_login)] <- 0
 
 rm(dt, hr, wk, mt)

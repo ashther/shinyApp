@@ -31,10 +31,10 @@ ui <- dashboardPage(
           
           # 第一行，实时用户数据
           fluidRow(
-              valueBoxOutput('total_user'), 
-              valueBoxOutput('new_user_today'), 
-              valueBoxOutput('active_user_today'), 
-              valueBoxOutput('login_times_today')
+              valueBoxOutput('total_user', width = 3), 
+              valueBoxOutput('new_user_today', width = 3), 
+              valueBoxOutput('active_user_today', width = 3), 
+              valueBoxOutput('login_times_today', width = 3)
           ), 
           
           # 第二行，历史用户数据
@@ -66,7 +66,7 @@ ui <- dashboardPage(
                   # 数据类型选项
                   box(selectInput('data_type', 
                                   label = 'select data type', 
-                                  choices = list('new' = 'new', 
+                                  choices = list('new' = 'new',
                                                  'active' = 'active', 
                                                  'login' = 'login', 
                                                  'retention' = 'retention'), 
@@ -78,6 +78,8 @@ ui <- dashboardPage(
                   box(dateRangeInput('date_range', 
                                      label = 'select date range', 
                                      min = min(daily_login$date_time), 
+                                     max = max(daily_login$date_time), 
+                                     start = Sys.Date() - 1, 
                                      language = 'zh-CN'), 
                       width = NULL, 
                       solidHeader = TRUE)
@@ -95,14 +97,52 @@ ui <- dashboardPage(
 
 server <- function(input, output) {
     
-    data_login <- reactive({
-        get(paste0(input$date_format, '_login'))
-    })
-    
+    # data_login <- reactive({
+    #     get(paste0(input$date_format, '_login'))
+    # })
+    # 
+    # data_login_range <- reactive({
+    #     subset(data_login(), 
+    #            as.Date(date_time) >= input$date_range[1] & 
+    #                as.Date(date_time) <= input$date_range[2])
+    # })
     data_login_range <- reactive({
-        subset(data_login(), 
-               as.Date(date_time) >= input$date_range[1] & 
-                   as.Date(date_time) <= input$date_range[2])
+        switch(input$date_format, 
+               'hourly' = subset(hourly_login, 
+                                 as.Date(date_time) >= input$date_range[1] & 
+                                     as.Date(date_time) <= input$date_range[2]), 
+               
+               'daily' = subset(daily_login, 
+                                as.Date(date_time) >= input$date_range[1] & 
+                                    as.Date(date_time) <= input$date_range[2]), 
+               
+               'weekly' = subset(weekly_login, 
+                                 paste(format(date_time, '%Y'), 
+                                       '-', 
+                                       format(date_time, '%V')) >= 
+                                     paste(format(input$date_range[1], '%Y'), 
+                                           '-', 
+                                           format(input$date_range[1], '%V')) & 
+                                     paste(format(date_time, '%Y'), 
+                                           '-', 
+                                           format(date_time, '%V')) <= 
+                                     paste(format(input$date_range[2], '%Y'), 
+                                           '-', 
+                                           format(input$date_range[2], '%V'))), 
+               
+               'monthly' = subset(monthly_login, 
+                                  paste(format(date_time, '%Y'), 
+                                        '-', 
+                                        format(date_time, '%m')) >= 
+                                      paste(format(input$date_range[1], '%Y'), 
+                                            '-', 
+                                            format(input$date_range[1], '%m')) & 
+                                      paste(format(date_time, '%Y'), 
+                                            '-', 
+                                            format(date_time, '%m')) <= 
+                                      paste(format(input$date_range[2], '%Y'), 
+                                            '-', 
+                                            format(input$date_range[2], '%m'))))
     })
     
     output$total_user <- renderValueBox({
@@ -110,15 +150,15 @@ server <- function(input, output) {
     })
     
     output$new_user_today <- renderValueBox({
-        valueBox(daily_login$new[daily_login$date_time == (Sys.Date() - 1)], 'new user')
+        valueBox(point_data$value[point_data$item == 'new_user'], 'new user')
     })
     
     output$active_user_today <- renderValueBox({
-        valueBox(daily_login$active[daily_login$date_time == (Sys.Date() - 1)], 'active user')
+        valueBox(point_data$value[point_data$item == 'active_user'], 'active user')
     })
     
     output$login_times_today <- renderValueBox({
-        valueBox()
+        valueBox(point_data$value[point_data$item == 'login_times'], 'login')
     })
     
     output$plot_login <- renderPlot({

@@ -6,15 +6,15 @@ shinyServer(function(input, output) {
     source('dataToXts.R')
     
     # 登录数据筛选
-    login_data <- reactive({
-        get(paste(input$login_date_format, input$login_data_type, sep = '_'))
+    data_login_range <- reactive({
+        get(paste(input$date_format, input$data_type, sep = '_'))
     })
     
     # 日登陆频次数据筛选
-    login_freq_data <- reactive({
-        paste(input$login_data_type_freq, input$login_freq_type, sep = '_', collapse = ',') %>%
-            sprintf('cbind(%s)', .) %>%
-            parse(text = .) %>%
+    data_freq_range <- reactive({
+        paste(input$freq_data_type, input$freq_type, sep = '_', collapse = ',') %>% 
+            sprintf('cbind(%s)', .) %>% 
+            parse(text = .) %>% 
             eval()
     })
     
@@ -44,20 +44,17 @@ shinyServer(function(input, output) {
     })
     
     # 登录数据绘图渲染
-    output$login_plot_1 <- renderDygraph({
-        dygraph(login_data()) %>% 
+    output$plot_login <- renderDygraph({
+        dygraph(data_login_range()) %>% 
             dyOptions(fillGraph = TRUE, fillAlpha = 0.2) %>% 
-            dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
-            dyRangeSelector(dateWindow = input$login_date_range)
+            dyRangeSelector(dateWindow = input$date_range)
     })
     
     # 日登陆频次数据绘图渲染
-    output$login_plot_2 <- renderDygraph({
-        dygraph(login_freq_data()) %>% 
-            dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>%
-            dyAxis('y', label = 'user number') %>% 
-            dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
-            dyRangeSelector(dateWindow = input$login_date_range_freq)
+    output$plot_daily_freq <- renderDygraph({
+        dygraph(data_freq_range()) %>% 
+            dyOptions(fillGraph = TRUE, fillAlpha = 0.2) %>% 
+            dyRangeSelector(dateWindow = input$freq_date_range)
     })
 })
 

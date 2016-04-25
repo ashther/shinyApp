@@ -51,6 +51,8 @@ hourlyRefresh <- function(now, hourly_login, con) {
     return(rbind(hourly_login, hourly_login_new[-1, ]))
 }
 
+city_location <- read.csv('city_location.csv', stringsAsFactors = FALSE, 
+                          row.names = NULL)
 
 con <- dbConnect(MySQL(), host = host, port = port, 
                  username = username, password = password, 

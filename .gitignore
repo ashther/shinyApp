@@ -46,3 +46,5 @@ Temporary Items
 *RData
 *.png
 *.rds
+*.csv
+*xlsx

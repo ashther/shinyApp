@@ -92,6 +92,13 @@ while (dbMoreResults(con)) {
 }
 dbClearResult(res)
 
+res <- dbSendQuery(con, 'select longitude, latitude from yz_app_trade_db.sell_commodity;')
+user_location <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
 # res <- dbSendQuery(con, 'select * from daily.quick_chat;')
 # daily_quick_chat <- dbFetch(res, n = -1)
 # while (dbMoreResults(con)) {
@@ -168,7 +175,15 @@ monthly_login[is.na(monthly_login)] <- 0
 
 rm(dt, hr, wk, mt)
 
-
+#==============================================================================
+user_location <- na.omit(user_location) %>% 
+    mutate(lng = round(as.numeric(longitude), 2), 
+           lat = round(as.numeric(latitude), 2)) %>% 
+    group_by(lng, lat) %>% 
+    summarise(n = n()) %>% 
+    ungroup() %>% 
+    arrange(desc(n)) %>% 
+    as.data.frame()
 
 
 

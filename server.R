@@ -1,5 +1,31 @@
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
+    
+    observe({
+        if (input$login_date_format == 'hourly') {
+            updateSelectInput(session, 
+                              'login_data_type', 
+                              choices = list('new' = 'new',
+                                             'active' = 'active',
+                                             'login' = 'log_in'), 
+                              selected = 'log_in')
+        } else {
+            updateSelectInput(session, 
+                              'login_data_type', 
+                              choices = list('new' = 'new',
+                                             'active' = 'active',
+                                             'login' = 'log_in', 
+                                             'retention' = 'retention'), 
+                              selected = 'active')
+            
+            updateDateRangeInput(session,
+                                 'login_date_range',
+                                 min = min(daily_login$date_time), 
+                                 max = max(daily_login$date_time), 
+                                 start = min(daily_login$date_time), 
+                                 end = max(daily_login$date_time))
+        }
+    })
     
     source('dataRefresh.R')
     
@@ -58,6 +84,18 @@ shinyServer(function(input, output) {
             dyAxis('y', label = 'user number') %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$login_date_range_freq)
+    })
+    
+    output$user_location <- renderLeaflet({
+        user_location %>% 
+            leaflet() %>% 
+            addTiles() %>% 
+            addCircleMarkers(radius = ~n, 
+                             fill = TRUE, 
+                             popup = ~as.character(n)) %>% 
+            setView(lng = input$user_location_lng, 
+                    lat = input$user_location_lat, 
+                    zoom = 13)
     })
 })
 

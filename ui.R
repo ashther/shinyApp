@@ -2,6 +2,7 @@
 library(shinydashboard)
 library(dygraphs)
 library(xts)
+library(leaflet)
 
 source('dataSource.R')
 
@@ -82,7 +83,13 @@ shinyUI(dashboardPage(
                                            start = Sys.Date() - 1, 
                                            language = 'zh-CN'), 
                             width = NULL, 
-                            solidHeader = TRUE)
+                            solidHeader = TRUE),
+                        
+                        helpText(paste0('NOTE: when date format is weekly/monthly, ', 
+                                        'the plot begins at the first weekday/monthday and ', 
+                                        'ends at the last weekday/monthday of date range selected, ', 
+                                        'and \'2016-04-11\' means the week between 2016.4.11 to 2016.4.18, ', 
+                                        '\'2016-04-01\' means the month between 2016.4.1 to 2016.4.30.' ))
                     )
                 ), 
                 
@@ -129,6 +136,34 @@ shinyUI(dashboardPage(
                                                               '>=3 & <6' = '3',
                                                               '>=1 & <3' = '1'), 
                                                selected = '1'), 
+                            width = NULL, 
+                            solidHeader = TRUE)
+                    )
+                ), 
+                
+                fluidRow(
+                    column(
+                        width = 8, 
+                        box(leafletOutput('user_location'), 
+                            width = NULL, 
+                            solidHeader = TRUE)
+                    ), 
+                    
+                    column(
+                        width = 4, 
+                        box(sliderInput('user_location_lng', 
+                                        'select longitude of map center: ', 
+                                        min = min(user_location$lng), 
+                                        max = max(user_location$lng), 
+                                        value = median(user_location$lng)), 
+                            width = NULL, 
+                            solidHeader = TRUE), 
+                        
+                        box(sliderInput('user_location_lat', 
+                                        'select latitude of map center: ', 
+                                        min = min(user_location$lat), 
+                                        max = max(user_location$lat), 
+                                        value = median(user_location$lat)), 
                             width = NULL, 
                             solidHeader = TRUE)
                     )

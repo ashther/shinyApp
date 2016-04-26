@@ -1,6 +1,7 @@
 
 shinyServer(function(input, output, session) {
     
+    # 当选择hourly时去掉rentention选项
     observe({
         if (input$login_date_format == 'hourly') {
             updateSelectInput(session, 
@@ -27,8 +28,9 @@ shinyServer(function(input, output, session) {
         }
     })
     
+    # 载入数据刷新过程
     source('dataRefresh.R')
-    
+    # 载入数据框转时间序列过程
     source('dataToXts.R')
     
     # 登录数据筛选
@@ -42,6 +44,10 @@ shinyServer(function(input, output, session) {
             sprintf('cbind(%s)', .) %>%
             parse(text = .) %>%
             eval()
+    })
+    
+    quick_chat_data <- reactive({
+        get(paste(input$quick_chat_date_format, 'quick_chat', input$quick_chat_data_type, sep = '_'))
     })
     
     # 累计用户数
@@ -86,6 +92,7 @@ shinyServer(function(input, output, session) {
             dyRangeSelector(dateWindow = input$login_date_range_freq)
     })
     
+    # 当省份选择变动时，更新对应的城市选项
     observe({
         city_update <- city_with_quote[city_location$province == input$province]
         
@@ -99,6 +106,7 @@ shinyServer(function(input, output, session) {
                               eval())
     })
     
+    # 地图输出
     output$user_location <- renderLeaflet({
         user_location %>% 
             leaflet() %>% 
@@ -111,6 +119,25 @@ shinyServer(function(input, output, session) {
             setView(lng = mean(city_location$lng[city_location$city == input$city]),
                     lat = mean(city_location$lat[city_location$city == input$city]),
                     zoom = 12)
+    })
+    
+    output$quick_chat_circle <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'quick_chat_circle'], 
+                 'circle number', 
+                 icon('users'))
+    })
+    
+    output$avg_circle_user <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'avg_circle_user'], 
+                 'average user number per circle', 
+                 icon('users'))
+    })
+    
+    output$quick_chat_plot <- renderDygraph({
+        dygraph(quick_chat_data()) %>% 
+            dyOptions(fillGraph = TRUE, fillAlpha = 0.2) %>% 
+            dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
+            dyRangeSelector(dateWindow = input$quick_chat_date_range)
     })
 })
 

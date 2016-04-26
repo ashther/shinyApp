@@ -103,19 +103,201 @@ while (dbMoreResults(con)) {
 }
 dbClearResult(res)
 
-# res <- dbSendQuery(con, 'select * from daily.quick_chat;')
-# daily_quick_chat <- dbFetch(res, n = -1)
-# while (dbMoreResults(con)) {
-#     dbNextResult(con)
-# }
-# dbClearResult(res)
-# 
-# res <- dbSendQuery(con, 'select * from hourly.quick_chat;')
-# hourly_quick_chat <- dbFetch(res, n = -1)
-# while (dbMoreResults(con)) {
-#     dbNextResult(con)
-# }
-# dbClearResult(res)
+res <- dbSendQuery(con, 'select * from daily.quick_chat;')
+daily_quick_chat <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from hourly.quick_chat;')
+hourly_quick_chat <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from weekly.quick_chat')
+weekly_quick_chat <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from monthly.quick_chat;')
+monthly_quick_chat <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from daily.calendar;')
+daily_calendar <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from hourly.calendar;')
+hourly_calendar <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from weekly.calendar')
+weekly_calendar <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from monthly.calendar;')
+monthly_calendar <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from daily.cooperation;')
+daily_cooperation <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from hourly.cooperation;')
+hourly_cooperation <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from weekly.cooperation')
+weekly_cooperation <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from monthly.cooperation;')
+monthly_cooperation <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from daily.hr;')
+daily_hr <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from hourly.hr;')
+hourly_hr <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from weekly.hr')
+weekly_hr <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from monthly.hr;')
+monthly_hr <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from daily.schedule;')
+daily_schedule <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from hourly.schedule;')
+hourly_schedule <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from weekly.schedule')
+weekly_schedule <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from monthly.schedule;')
+monthly_schedule <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from daily.trade;')
+daily_trade <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from hourly.trade;')
+hourly_trade <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from weekly.trade')
+weekly_trade <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from monthly.trade;')
+monthly_trade <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from daily.train;')
+daily_train <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from hourly.train;')
+hourly_train <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from weekly.train')
+weekly_train <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, 'select * from monthly.train;')
+monthly_train <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
 
 dbDisconnect(con)
 
@@ -130,6 +312,55 @@ hourly_login$date_time <- strptime(hourly_login$date_time,
 weekly_login$first_weekday <- as.Date(weekly_login$first_weekday)
 monthly_login$first_monthday <- strptime(paste0(monthly_login$year_month_id, '-01'), 
                                          format = '%Y-%m-%d') %>% as.Date()
+
+daily_quick_chat$date_time <- as.Date(daily_quick_chat$date_time)
+hourly_quick_chat$date_time <- strptime(hourly_quick_chat$date_time, 
+                                        format = '%Y-%m-%d-%H') %>% as.POSIXct()
+weekly_quick_chat$first_weekday <- as.Date(weekly_quick_chat$first_weekday)
+monthly_quick_chat$first_monthday <- strptime(paste0(monthly_quick_chat$year_month_id, '-01'), 
+                                              format = '%Y-%m-%d') %>% as.Date()
+
+daily_calendar$date_time <- as.Date(daily_calendar$date_time)
+hourly_calendar$date_time <- strptime(hourly_calendar$date_time, 
+                                   format = '%Y-%m-%d-%H') %>% as.POSIXct()
+weekly_calendar$first_weekday <- as.Date(weekly_calendar$first_weekday)
+monthly_calendar$first_monthday <- strptime(paste0(monthly_calendar$year_month_id, '-01'), 
+                                         format = '%Y-%m-%d') %>% as.Date()
+
+daily_cooperation$date_time <- as.Date(daily_cooperation$date_time)
+hourly_cooperation$date_time <- strptime(hourly_cooperation$date_time, 
+                                   format = '%Y-%m-%d-%H') %>% as.POSIXct()
+weekly_cooperation$first_weekday <- as.Date(weekly_cooperation$first_weekday)
+monthly_cooperation$first_monthday <- strptime(paste0(monthly_cooperation$year_month_id, '-01'), 
+                                         format = '%Y-%m-%d') %>% as.Date()
+
+daily_hr$date_time <- as.Date(daily_hr$date_time)
+hourly_hr$date_time <- strptime(hourly_hr$date_time, 
+                                   format = '%Y-%m-%d-%H') %>% as.POSIXct()
+weekly_hr$first_weekday <- as.Date(weekly_hr$first_weekday)
+monthly_hr$first_monthday <- strptime(paste0(monthly_hr$year_month_id, '-01'), 
+                                         format = '%Y-%m-%d') %>% as.Date()
+
+daily_schedule$date_time <- as.Date(daily_schedule$date_time)
+hourly_schedule$date_time <- strptime(hourly_schedule$date_time, 
+                                   format = '%Y-%m-%d-%H') %>% as.POSIXct()
+weekly_schedule$first_weekday <- as.Date(weekly_schedule$first_weekday)
+monthly_schedule$first_monthday <- strptime(paste0(monthly_schedule$year_month_id, '-01'), 
+                                         format = '%Y-%m-%d') %>% as.Date()
+
+daily_trade$date_time <- as.Date(daily_trade$date_time)
+hourly_trade$date_time <- strptime(hourly_trade$date_time, 
+                                   format = '%Y-%m-%d-%H') %>% as.POSIXct()
+weekly_trade$first_weekday <- as.Date(weekly_trade$first_weekday)
+monthly_trade$first_monthday <- strptime(paste0(monthly_trade$year_month_id, '-01'), 
+                                         format = '%Y-%m-%d') %>% as.Date()
+
+daily_train$date_time <- as.Date(daily_train$date_time)
+hourly_train$date_time <- strptime(hourly_train$date_time, 
+                                   format = '%Y-%m-%d-%H') %>% as.POSIXct()
+weekly_train$first_weekday <- as.Date(weekly_train$first_weekday)
+monthly_train$first_monthday <- strptime(paste0(monthly_train$year_month_id, '-01'), 
+                                         format = '%Y-%m-%d') %>% as.Date()
 # =============================================================================
 
 dt <- data.frame(date_time = seq(from = min(daily_login$date_time),
@@ -140,6 +371,37 @@ daily_login <- left_join(dt, daily_login, by = 'date_time') %>%
     mutate(retention = round(retention / NEW, 3)) %>%
     select(date_time, new = NEW, active, login, retention, contains('freq'))
 daily_login[is.na(daily_login)] <- 0
+
+daily_quick_chat <- left_join(dt, daily_quick_chat, by = 'date_time') %>% 
+    select(date_time, active_circle, message, active_user)
+daily_quick_chat[is.na(daily_quick_chat)] <- 0
+
+daily_calendar <- left_join(dt, daily_calendar, by = 'date_time') %>% 
+    select(date_time, new_activity, new_user)
+daily_calendar[is.na(daily_calendar)] <- 0
+
+daily_cooperation <- left_join(dt, daily_cooperation, by = 'date_time') %>% 
+    select(date_time, new_company,new_project, active_user, new_view, new_collect, new_apply)
+daily_cooperation[is.na(daily_cooperation)] <- 0
+
+daily_hr <- left_join(dt, daily_hr, by = 'date_time') %>% 
+    select(date_time, new_user, new_company, new_recruitment, update_recruitment, 
+           jobseekers_operation, hr_operation)
+daily_hr[is.na(daily_hr)] <- 0
+
+daily_schedule <- left_join(dt, daily_schedule, by = 'date_time') %>% 
+    select(date_time, new_course, new_user, active_user, new_file, operation)
+daily_schedule[is.na(daily_schedule)] <- 0
+
+daily_trade <- left_join(dt, daily_trade, by = 'date_time') %>% 
+    select(date_time, new_sell_info, new_buy_info, active_seller, active_buyer, 
+           active_trader)
+daily_trade[is.na(daily_trade)] <- 0
+
+daily_train <- left_join(dt, daily_train, by = 'date_time') %>% 
+    select(date_time, new_company, new_course, active_user, new_view, new_collect, 
+           new_apply, new_contact)
+daily_train[is.na(daily_train)] <- 0
 
 # =============================================================================
 
@@ -154,6 +416,37 @@ hourly_login <- left_join(hr, hourly_login, by = 'date_time') %>%
     select(date_time, new, active, login)
 hourly_login[is.na(hourly_login)] <- 0
 
+hourly_quick_chat <- left_join(hr, hourly_quick_chat, by = 'date_time') %>% 
+    select(date_time, active_circle, message, active_user)
+hourly_quick_chat[is.na(hourly_quick_chat)] <- 0
+
+hourly_calendar <- left_join(hr, hourly_calendar, by = 'date_time') %>% 
+    select(date_time, new_activity, new_user)
+hourly_calendar[is.na(hourly_calendar)] <- 0
+
+hourly_cooperation <- left_join(hr, hourly_cooperation, by = 'date_time') %>% 
+    select(date_time, new_company,new_project, active_user, new_view, new_collect, new_apply)
+hourly_cooperation[is.na(hourly_cooperation)] <- 0
+
+hourly_hr <- left_join(hr, hourly_hr, by = 'date_time') %>% 
+    select(date_time, new_user, new_company, new_recruitment, update_recruitment, 
+           jobseekers_operation, hr_operation)
+hourly_hr[is.na(hourly_hr)] <- 0
+
+hourly_schedule <- left_join(hr, hourly_schedule, by = 'date_time') %>% 
+    select(date_time, new_course, new_user, active_user, new_file, operation)
+hourly_schedule[is.na(hourly_schedule)] <- 0
+
+hourly_trade <- left_join(hr, hourly_trade, by = 'date_time') %>% 
+    select(date_time, new_sell_info, new_buy_info, active_seller, active_buyer, 
+           active_trader)
+hourly_trade[is.na(hourly_trade)] <- 0
+
+hourly_train <- left_join(hr, hourly_train, by = 'date_time') %>% 
+    select(date_time, new_company, new_course, active_user, new_view, new_collect, 
+           new_apply, new_contact)
+hourly_train[is.na(hourly_train)] <- 0
+
 # =============================================================================
 
 wk <- data.frame(first_weekday = seq(from = min(weekly_login$first_weekday),
@@ -164,6 +457,37 @@ weekly_login <- left_join(wk, weekly_login, c('first_weekday', 'year_week')) %>%
     mutate(retention = round(retention / NEW, 3)) %>%
     select(date_time = first_weekday, year_week, new = NEW, active, login, retention)
 weekly_login[is.na(weekly_login)] <- 0
+
+weekly_quick_chat <- left_join(wk, weekly_quick_chat, c('first_weekday', 'year_week')) %>% 
+    select(date_time = first_weekday, year_week, active_circle, message, active_user)
+weekly_quick_chat[is.na(weekly_quick_chat)] <- 0
+
+weekly_calendar <- left_join(wk, weekly_calendar, c('first_weekday', 'year_week')) %>% 
+    select(date_time = first_weekday, year_week, new_activity, new_user)
+weekly_calendar[is.na(weekly_calendar)] <- 0
+
+weekly_cooperation <- left_join(wk, weekly_cooperation, c('first_weekday', 'year_week')) %>% 
+    select(date_time = first_weekday, year_week, new_company,new_project, active_user, new_view, new_collect, new_apply)
+weekly_cooperation[is.na(weekly_cooperation)] <- 0
+
+weekly_hr <- left_join(wk, weekly_hr, c('first_weekday', 'year_week')) %>% 
+    select(date_time = first_weekday, year_week, new_user, new_company, new_recruitment, update_recruitment, 
+           jobseekers_operation, hr_operation)
+weekly_hr[is.na(weekly_hr)] <- 0
+
+weekly_schedule <- left_join(wk, weekly_schedule, c('first_weekday', 'year_week')) %>% 
+    select(date_time = first_weekday, year_week, new_course, new_user, active_user, new_file, operation)
+weekly_schedule[is.na(weekly_schedule)] <- 0
+
+weekly_trade <- left_join(wk, weekly_trade, c('first_weekday', 'year_week')) %>% 
+    select(date_time = first_weekday, year_week, new_sell_info, new_buy_info, active_seller, active_buyer, 
+           active_trader)
+weekly_trade[is.na(weekly_trade)] <- 0
+
+weekly_train <- left_join(wk, weekly_train, c('first_weekday', 'year_week')) %>% 
+    select(date_time = first_weekday, year_week, new_company, new_course, active_user, new_view, new_collect, 
+           new_apply, new_contact)
+weekly_train[is.na(weekly_train)] <- 0
 
 # =============================================================================
 
@@ -176,6 +500,37 @@ monthly_login <- left_join(mt, monthly_login, c('first_monthday', 'year_month_id
     mutate(retention = round(retention / NEW, 3)) %>%
     select(date_time = first_monthday, year_month_id, new = NEW, active, login, retention)
 monthly_login[is.na(monthly_login)] <- 0
+
+monthly_quick_chat <- left_join(mt, monthly_quick_chat, c('first_monthday', 'year_month_id')) %>% 
+    select(date_time = first_monthday, active_circle, message, active_user)
+monthly_quick_chat[is.na(monthly_quick_chat)] <- 0
+
+monthly_calendar <- left_join(mt, monthly_calendar, c('first_monthday', 'year_month_id')) %>% 
+    select(date_time = first_monthday, year_month_id, new_activity, new_user)
+monthly_calendar[is.na(monthly_calendar)] <- 0
+
+monthly_cooperation <- left_join(mt, monthly_cooperation, c('first_monthday', 'year_month_id')) %>% 
+    select(date_time = first_monthday, year_month_id, new_company,new_project, active_user, new_view, new_collect, new_apply)
+monthly_cooperation[is.na(monthly_cooperation)] <- 0
+
+monthly_hr <- left_join(mt, monthly_hr, c('first_monthday', 'year_month_id')) %>% 
+    select(date_time = first_monthday, year_month_id, new_user, new_company, new_recruitment, update_recruitment, 
+           jobseekers_operation, hr_operation)
+monthly_hr[is.na(monthly_hr)] <- 0
+
+monthly_schedule <- left_join(mt, monthly_schedule, c('first_monthday', 'year_month_id')) %>% 
+    select(date_time = first_monthday, year_month_id, new_course, new_user, active_user, new_file, operation)
+monthly_schedule[is.na(monthly_schedule)] <- 0
+
+monthly_trade <- left_join(mt, monthly_trade, c('first_monthday', 'year_month_id')) %>% 
+    select(date_time = first_monthday, year_month_id, new_sell_info, new_buy_info, active_seller, active_buyer, 
+           active_trader)
+monthly_trade[is.na(monthly_trade)] <- 0
+
+monthly_train <- left_join(mt, monthly_train, c('first_monthday', 'year_month_id')) %>% 
+    select(date_time = first_monthday, year_month_id, new_company, new_course, active_user, new_view, new_collect, 
+           new_apply, new_contact)
+monthly_train[is.na(monthly_train)] <- 0
 
 rm(dt, hr, wk, mt)
 

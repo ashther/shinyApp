@@ -141,7 +141,10 @@ shinyUI(dashboardPage(
                     )
                 ), 
                 
+                #第四行，地图
                 fluidRow(
+                    
+                    # 第四行第一列，地图
                     column(
                         width = 8, 
                         box(leafletOutput('user_location'), 
@@ -149,9 +152,11 @@ shinyUI(dashboardPage(
                             solidHeader = TRUE)
                     ), 
                     
+                    # 第四行第二列，地图选项
                     column(
                         width = 4, 
                         
+                        # 省份选项
                         box(selectInput('province', 
                                         'select a province', 
                                         choices = province_with_quote %>% 
@@ -164,6 +169,7 @@ shinyUI(dashboardPage(
                             width = NULL, 
                             solidHeader = TRUE), 
                         
+                        # 城市选项
                         box(selectInput('city', 
                                         'select a city', 
                                         choices = list('西安市' = '西安市'), 
@@ -176,7 +182,63 @@ shinyUI(dashboardPage(
             
             tabItem(
                 tabName = 'quick_chat',
-                h2('quick_chat')
+                
+                fluidRow(
+                    valueBoxOutput('quick_chat_circle', width = 3), 
+                    valueBoxOutput('avg_circle_user', width = 3)
+                ), 
+                
+                fluidRow(
+                    
+                    column(
+                        width = 8, 
+                        box(dygraphOutput('quick_chat_plot'), 
+                            width = NULL, 
+                            solidHeader = TRUE)
+                    ), 
+                    
+                    # 第二行第二列，绘图选项
+                    column(
+                        width = 4, 
+                        
+                        # 小时/日/周/月选项
+                        box(selectInput('quick_chat_date_format', 
+                                        label = 'select time format', 
+                                        choices = list('hourly' = 'hourly', 
+                                                       'daily' = 'daily', 
+                                                       'weekly' = 'weekly', 
+                                                       'monthly' = 'monthly'), 
+                                        selected = 'hourly'), 
+                            width = NULL, 
+                            solidHeader = TRUE), 
+                        
+                        # 数据类型选项
+                        box(selectInput('quick_chat_data_type', 
+                                        label = 'select data type', 
+                                        choices = list('active cirle' = 'active_circle', 
+                                                       'message' = 'message', 
+                                                       'active user' = 'active_user'), 
+                                        selected = 'message'), 
+                            width = NULL, 
+                            solidHeader = TRUE), 
+                        
+                        # 时间范围选项
+                        box(dateRangeInput('quick_chat_date_range', 
+                                           label = 'select date range', 
+                                           min = min(daily_login$date_time), 
+                                           max = max(daily_login$date_time), 
+                                           start = min(daily_login$date_time), 
+                                           language = 'zh-CN'), 
+                            width = NULL, 
+                            solidHeader = TRUE),
+                        
+                        helpText(paste0('NOTE: when date format is weekly/monthly, ', 
+                                        'the plot begins at the first weekday/monthday and ', 
+                                        'ends at the last weekday/monthday of date range selected, ', 
+                                        'and \'2016-04-11\' means the week between 2016.4.11 to 2016.4.18, ', 
+                                        '\'2016-04-01\' means the month between 2016.4.1 to 2016.4.30.' ))
+                    )
+                )
             )
         )
     )

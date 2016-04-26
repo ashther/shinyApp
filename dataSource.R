@@ -53,6 +53,8 @@ hourlyRefresh <- function(now, hourly_login, con) {
 
 city_location <- read.csv('city_location.csv', stringsAsFactors = FALSE, 
                           row.names = NULL)
+city_with_quote <- paste0('\'', city_location$city, '\'')
+province_with_quote <- paste0('\'', unique(city_location$province), '\'')
 
 con <- dbConnect(MySQL(), host = host, port = port, 
                  username = username, password = password, 
@@ -179,9 +181,9 @@ rm(dt, hr, wk, mt)
 
 #==============================================================================
 user_location <- na.omit(user_location) %>% 
-    mutate(lng = round(as.numeric(longitude), 2), 
-           lat = round(as.numeric(latitude), 2)) %>% 
-    group_by(lng, lat) %>% 
+    mutate(longitude = round(as.numeric(longitude), 2), 
+           latitude = round(as.numeric(latitude), 2)) %>% 
+    group_by(longitude, latitude) %>% 
     summarise(n = n()) %>% 
     ungroup() %>% 
     arrange(desc(n)) %>% 

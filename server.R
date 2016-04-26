@@ -27,45 +27,6 @@ shinyServer(function(input, output, session) {
         }
     })
     
-    observe({
-        if (input$province == '安徽省') {
-            updateSelectInput(session, 
-                              'city', 
-                              choices = list('安庆市' = '安庆市', 
-                                             '蚌埠市' = '蚌埠市', 
-                                             '亳州市' = '亳州市', 
-                                             '巢湖市' = '巢湖市', 
-                                             '池州市' = '池州市', 
-                                             '滁州市' = '滁州市', 
-                                             '阜阳市' = '阜阳市', 
-                                             '合肥市' = '合肥市', 
-                                             '淮北市' = '淮北市', 
-                                             '淮南市' = '淮南市', 
-                                             '黄山市' = '黄山市', 
-                                             '六安市' = '六安市', 
-                                             '马鞍山市' = '马鞍山市', 
-                                             '宿州市' = '宿州市', 
-                                             '铜陵市' = '铜陵市', 
-                                             '芜湖市' = '芜湖市', 
-                                             '宣城市' = '宣城市'), 
-                              selected = '合肥市')
-        } else if (input$province == '陕西省') {
-            updateSelectInput(session, 
-                              'city', 
-                              choices = list('安康市' = '安康市', 
-                                             '宝鸡市' = '宝鸡市', 
-                                             '汉中市' = '汉中市', 
-                                             '商洛市' = '商洛市', 
-                                             '铜川市' = '铜川市', 
-                                             '渭南市' = '渭南市', 
-                                             '西安市' = '西安市',
-                                             '咸阳市' = '咸阳市',
-                                             '延安市' = '延安市',
-                                             '榆林市' = '榆林市'), 
-                              selected = '西安市')
-        }
-    })
-    
     source('dataRefresh.R')
     
     source('dataToXts.R')
@@ -125,15 +86,30 @@ shinyServer(function(input, output, session) {
             dyRangeSelector(dateWindow = input$login_date_range_freq)
     })
     
+    observe({
+        city_update <- city_with_quote[city_location$province == input$province]
+        
+        updateSelectInput(session, 
+                          'city', 
+                          choices = city_update %>%
+                              paste0(., '=', .) %>%
+                              paste(collapse = ',') %>%
+                              sprintf('list(%s)', .) %>%
+                              parse(text = .) %>%
+                              eval())
+    })
+    
     output$user_location <- renderLeaflet({
         user_location %>% 
             leaflet() %>% 
             addTiles() %>% 
-            addCircleMarkers(radius = ~n, 
+            addCircleMarkers(lng = user_location$longitude,
+                             lat = user_location$latitude, 
+                             radius = user_location$n, 
                              fill = TRUE, 
-                             popup = ~as.character(n)) %>% 
-            setView(lng = input$user_location_lng, 
-                    lat = input$user_location_lat, 
+                             popup = as.character(user_location$n)) %>% 
+            setView(lng = mean(city_location$lng[city_location$city == input$city]),
+                    lat = mean(city_location$lat[city_location$city == input$city]),
                     zoom = 12)
     })
 })

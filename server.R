@@ -46,10 +46,6 @@ shinyServer(function(input, output, session) {
             eval()
     })
     
-    quick_chat_data <- reactive({
-        get(paste(input$quick_chat_date_format, 'quick_chat', input$quick_chat_data_type, sep = '_'))
-    })
-    
     # 累计用户数
     output$total_user <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'total_user'], 
@@ -110,34 +106,239 @@ shinyServer(function(input, output, session) {
     output$user_location <- renderLeaflet({
         user_location %>% 
             leaflet() %>% 
-            addTiles() %>% 
+            addTiles(urlTemplate = 'http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png') %>% 
             addCircleMarkers(lng = user_location$longitude,
                              lat = user_location$latitude, 
                              radius = user_location$n, 
-                             fill = TRUE, 
+                             fillOpacity = 0.4,  #when user scale get larger use stroke = FALSE & fillOpacity = 0.35
                              popup = as.character(user_location$n)) %>% 
             setView(lng = mean(city_location$lng[city_location$city == input$city]),
                     lat = mean(city_location$lat[city_location$city == input$city]),
                     zoom = 12)
     })
     
+    # quick_chat===============================================================
+    quick_chat_data <- reactive({
+        get(paste(input$quick_chat_date_format, 'quick_chat', input$quick_chat_data_type, sep = '_'))
+    })
+    
     output$quick_chat_circle <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'quick_chat_circle'], 
                  'circle number', 
-                 icon('users'))
+                 icon('object-group'), 
+                 'olive')
     })
     
     output$avg_circle_user <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'avg_circle_user'], 
                  'average user number per circle', 
-                 icon('users'))
+                 icon('users'), 
+                 'olive')
     })
     
     output$quick_chat_plot <- renderDygraph({
         dygraph(quick_chat_data()) %>% 
-            dyOptions(fillGraph = TRUE, fillAlpha = 0.2) %>% 
+            dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'olive') %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$quick_chat_date_range)
+    })
+    
+    # calendar ===============================================================
+    calendar_data <- reactive({
+        get(paste(input$calendar_date_format, 'calendar', input$calendar_data_type, sep = '_'))
+    })
+    
+    output$calendar_activity <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'calendar_activity'], 
+                 'activity number', 
+                 icon('calendar'), 
+                 'light-blue')
+    })
+    
+    output$avg_activity_user <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'avg_activity_user'], 
+                 'average user number per activity', 
+                 icon('users'), 
+                 'light-blue')
+    })
+    
+    output$calendar_plot <- renderDygraph({
+        dygraph(calendar_data()) %>% 
+            dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'light-blue') %>% 
+            dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
+            dyRangeSelector(dateWindow = input$calendar_date_range)
+    })
+    
+    # cooperation ===============================================================
+    cooperation_data <- reactive({
+        get(paste(input$cooperation_date_format, 'cooperation', input$cooperation_data_type, sep = '_'))
+    })
+    
+    output$cooperation_company <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'cooperation_company'], 
+                 'cooperation company number', 
+                 icon('briefcase', lib = 'glyphicon'), 
+                 'green')
+    })
+    
+    output$cooperation_project <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'cooperation_project'], 
+                 'cooperation project number', 
+                 icon('folder-open', lib = 'glyphicon'), 
+                 'green')
+    })
+    
+    output$cooperation_user <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'cooperation_user'], 
+                 'cooperation user number', 
+                 icon('users'), 
+                 'green')
+    })
+    
+    output$cooperation_plot <- renderDygraph({
+        dygraph(cooperation_data()) %>% 
+            dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'green') %>% 
+            dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
+            dyRangeSelector(dateWindow = input$calendar_date_range)
+    })
+    
+    # hr ===============================================================
+    hr_data <- reactive({
+        get(paste(input$hr_date_format, 'hr', input$hr_data_type, sep = '_'))
+    })
+    
+    output$jobseeker <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'jobseeker'], 
+                 'jobseekers number', 
+                 icon('users'), 
+                 'blue')
+    })
+    
+    output$hr_company <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'hr_company'], 
+                 'company number', 
+                 icon('briefcase', lib = 'glyphicon'), 
+                 'blue')
+    })
+    
+    output$recruitment <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'recruitment'], 
+                 'recruitment number', 
+                 icon('file-text'), 
+                 'blue')
+    })
+    
+    output$hr_plot <- renderDygraph({
+        dygraph(hr_data()) %>% 
+            dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'blue') %>% 
+            dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
+            dyRangeSelector(dateWindow = input$calendar_date_range)
+    })
+    
+    # schedule ===============================================================
+    schedule_data <- reactive({
+        get(paste(input$schedule_date_format, 'schedule', input$schedule_data_type, sep = '_'))
+    })
+    
+    output$schedule_course <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'schedule_course'], 
+                 'schedule course number', 
+                 icon('university'), 
+                 'yellow')
+    })
+    
+    output$upload_course_file <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'upload_course_file'], 
+                 'upload file number', 
+                 icon('upload'), 
+                 'yellow')
+    })
+    
+    output$avg_course_user <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'avg_course_user'], 
+                 'average user per course', 
+                 icon('users'), 
+                 'yellow')
+    })
+    
+    output$schedule_plot <- renderDygraph({
+        dygraph(schedule_data()) %>% 
+            dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'orange') %>% 
+            dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
+            dyRangeSelector(dateWindow = input$calendar_date_range)
+    })
+    
+    # trade ===============================================================
+    trade_data <- reactive({
+        get(paste(input$trade_date_format, 'trade', input$trade_data_type, sep = '_'))
+    })
+    
+    output$sell_info <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'sell_info'], 
+                 'sell information number', 
+                 icon('mobile'), 
+                 'maroon')
+    })
+    
+    output$seller <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'seller'], 
+                 'seller number', 
+                 icon('users'), 
+                 'maroon')
+    })
+    
+    output$purchase_info <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'purchase_info'], 
+                 'purchase information number', 
+                 icon('laptop'), 
+                 'maroon')
+    })
+    
+    output$purchaser <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'purchaser'], 
+                 'buyer number', 
+                 icon('users'), 
+                 'maroon')
+    })
+    
+    output$trade_plot <- renderDygraph({
+        dygraph(trade_data()) %>% 
+            dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'maroon') %>% 
+            dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
+            dyRangeSelector(dateWindow = input$calendar_date_range)
+    })
+    
+    # train ===============================================================
+    train_data <- reactive({
+        get(paste(input$train_date_format, 'train', input$train_data_type, sep = '_'))
+    })
+    
+    output$train_company <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'train_company'], 
+                 'company number', 
+                 icon('briefcase', lib = 'glyphicon'), 
+                 'purple')
+    })
+    
+    output$train_course <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'train_course'], 
+                 'course number', 
+                 icon('book'), 
+                 'purple')
+    })
+    
+    output$train_user <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'train_user'], 
+                 'user number', 
+                 icon('users'), 
+                 'purple')
+    })
+    
+    output$train_plot <- renderDygraph({
+        dygraph(train_data()) %>% 
+            dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'purple') %>% 
+            dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
+            dyRangeSelector(dateWindow = input$calendar_date_range)
     })
 })
 

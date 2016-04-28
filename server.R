@@ -6,17 +6,17 @@ shinyServer(function(input, output, session) {
         if (input$login_date_format == 'hourly') {
             updateSelectInput(session, 
                               'login_data_type', 
-                              choices = list('new' = 'new',
-                                             'active' = 'active',
-                                             'login' = 'log_in'), 
+                              choices = list('新增用户数' = 'new',
+                                             '活跃用户数' = 'active',
+                                             '登陆次数' = 'log_in'), 
                               selected = 'log_in')
         } else {
             updateSelectInput(session, 
                               'login_data_type', 
-                              choices = list('new' = 'new',
-                                             'active' = 'active',
-                                             'login' = 'log_in', 
-                                             'retention' = 'retention'), 
+                              choices = list('新增用户数' = 'new',
+                                             '活跃用户数' = 'active',
+                                             '登陆次数' = 'log_in', 
+                                             '留存率' = 'retention'), 
                               selected = 'active')
             
             updateDateRangeInput(session,
@@ -46,34 +46,51 @@ shinyServer(function(input, output, session) {
             eval()
     })
     
+    map_data <- reactive({
+        subset(user_location, create_time >= input$map_date_range[1] & 
+                              create_time <= input$map_date_range[2])
+    })
+    
     # 累计用户数
     output$total_user <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'total_user'], 
-                 'total user', 
+                 '累计用户数', 
                  icon('users'))
     })
     # 当日新增用户数
     output$new_user_today <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'new_user'], 
-                 'new user', 
+                 '当日新增用户数', 
                  icon('user-plus'))
     })
     # 当日活跃用户数
     output$active_user_today <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'active_user'], 
-                 'active user', 
+                 '当日活跃用户数', 
                  icon('user'))
     })
     # 当日登陆次数
     output$login_times_today <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'login_times'], 
-                 'login', 
+                 '当日登录次数', 
                  icon('power-off'))
     })
     
     # 登录数据绘图渲染
     output$login_plot_1 <- renderDygraph({
-        dygraph(login_data()) %>% 
+        dygraph(login_data(), 
+                main = sprintf('%s变化趋势',
+                               switch(input$login_data_type,
+                                      'new' = '新增用户数',
+                                      'active' = '活跃用户数',
+                                      'log_in' = '登陆次数',
+                                      'retention' = '留存率'))) %>% 
+            dySeries(label = sprintf('%s',
+                                     switch(input$login_data_type,
+                                            'new' = '新增用户数',
+                                            'active' = '活跃用户数',
+                                            'log_in' = '登陆次数',
+                                            'retention' = '留存率'))) %>% 
             dyOptions(fillGraph = TRUE, fillAlpha = 0.2) %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$login_date_range)
@@ -81,10 +98,10 @@ shinyServer(function(input, output, session) {
     
     # 日登陆频次数据绘图渲染
     output$login_plot_2 <- renderDygraph({
-        dygraph(login_freq_data()) %>% 
+        dygraph(login_freq_data(), main = '不同日登陆频次区间用户数') %>% 
             dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>%
-            dyAxis('y', label = 'user number') %>% 
-            dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
+            dyAxis('y', label = '用户数') %>% 
+            dyLegend(show = 'always', hideOnMouseOut = TRUE, width = 400) %>% 
             dyRangeSelector(dateWindow = input$login_date_range_freq)
     })
     
@@ -104,14 +121,24 @@ shinyServer(function(input, output, session) {
     
     # 地图输出
     output$user_location <- renderLeaflet({
-        user_location %>% 
+        
+        user_location_temp <- map_data() %>% 
+            mutate(longitude = round(as.numeric(longitude), 2),
+                   latitude = round(as.numeric(latitude), 2)) %>%
+            group_by(longitude, latitude) %>%
+            summarise(n = n()) %>%
+            ungroup() %>%
+            arrange(desc(n)) %>%
+            as.data.frame()
+        
+        user_location_temp %>% 
             leaflet() %>% 
             addTiles(urlTemplate = 'http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png') %>% 
-            addCircleMarkers(lng = user_location$longitude,
-                             lat = user_location$latitude, 
-                             radius = user_location$n, 
+            addCircleMarkers(lng = user_location_temp$longitude,
+                             lat = user_location_temp$latitude, 
+                             radius = user_location_temp$n, 
                              fillOpacity = 0.4,  #when user scale get larger use stroke = FALSE & fillOpacity = 0.35
-                             popup = as.character(user_location$n)) %>% 
+                             popup = as.character(user_location_temp$n)) %>% 
             setView(lng = mean(city_location$lng[city_location$city == input$city]),
                     lat = mean(city_location$lat[city_location$city == input$city]),
                     zoom = 12)
@@ -124,20 +151,30 @@ shinyServer(function(input, output, session) {
     
     output$quick_chat_circle <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'quick_chat_circle'], 
-                 'circle number', 
+                 '累计圈子数', 
                  icon('object-group'), 
                  'olive')
     })
     
     output$avg_circle_user <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'avg_circle_user'], 
-                 'average user number per circle', 
+                 '圈子平均用户数', 
                  icon('users'), 
                  'olive')
     })
     
     output$quick_chat_plot <- renderDygraph({
-        dygraph(quick_chat_data()) %>% 
+        dygraph(quick_chat_data(), 
+                main = sprintf('%s变化趋势',
+                               switch(input$quick_chat_data_type,
+                                      'active_circle' = '活跃圈子数',
+                                      'message' = '消息数',
+                                      'active_user' = '活跃用户数'))) %>% 
+            dySeries(label = sprintf('%s',
+                                     switch(input$quick_chat_data_type,
+                                            'active_circle' = '活跃圈子数',
+                                            'message' = '消息数',
+                                            'active_user' = '活跃用户数'))) %>% 
             dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'olive') %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$quick_chat_date_range)
@@ -150,20 +187,28 @@ shinyServer(function(input, output, session) {
     
     output$calendar_activity <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'calendar_activity'], 
-                 'activity number', 
+                 '累计活动数', 
                  icon('calendar'), 
                  'light-blue')
     })
     
     output$avg_activity_user <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'avg_activity_user'], 
-                 'average user number per activity', 
+                 '活动平均用户数', 
                  icon('users'), 
                  'light-blue')
     })
     
     output$calendar_plot <- renderDygraph({
-        dygraph(calendar_data()) %>% 
+        dygraph(calendar_data(), 
+                main = sprintf('%s变化趋势',
+                               switch(input$calendar_data_type,
+                                      'new_activity' = '新增活动数',
+                                      'new_user' = '新增用户数'))) %>% 
+            dySeries(label = sprintf('%s',
+                                     switch(input$calendar_data_type,
+                                            'new_activity' = '新增活动数',
+                                            'new_user' = '新增用户数'))) %>%
             dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'light-blue') %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$calendar_date_range)
@@ -176,27 +221,43 @@ shinyServer(function(input, output, session) {
     
     output$cooperation_company <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'cooperation_company'], 
-                 'cooperation company number', 
+                 '累计企业数', 
                  icon('briefcase', lib = 'glyphicon'), 
                  'green')
     })
     
     output$cooperation_project <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'cooperation_project'], 
-                 'cooperation project number', 
+                 '累计项目数', 
                  icon('folder-open', lib = 'glyphicon'), 
                  'green')
     })
     
     output$cooperation_user <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'cooperation_user'], 
-                 'cooperation user number', 
+                 '累计用户数', 
                  icon('users'), 
                  'green')
     })
     
     output$cooperation_plot <- renderDygraph({
-        dygraph(cooperation_data()) %>% 
+        dygraph(cooperation_data(), 
+                main = sprintf('%s变化趋势',
+                               switch(input$cooperation_data_type,
+                                      'new_company' = '活跃企业数',
+                                      'new_project' = '新增项目数', 
+                                      'active_user' = '活跃用户数', 
+                                      'new_view' = '浏览数', 
+                                      'new_collect' = '收藏数', 
+                                      'new_apply' = '申请数'))) %>% 
+            dySeries(label = sprintf('%s',
+                                     switch(input$cooperation_data_type,
+                                            'new_company' = '活跃企业数',
+                                            'new_project' = '新增项目数', 
+                                            'active_user' = '活跃用户数', 
+                                            'new_view' = '浏览数', 
+                                            'new_collect' = '收藏数', 
+                                            'new_apply' = '申请数'))) %>%
             dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'green') %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$calendar_date_range)
@@ -209,27 +270,43 @@ shinyServer(function(input, output, session) {
     
     output$jobseeker <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'jobseeker'], 
-                 'jobseekers number', 
+                 '求职用户数', 
                  icon('users'), 
                  'blue')
     })
     
     output$hr_company <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'hr_company'], 
-                 'company number', 
+                 '招聘企业数', 
                  icon('briefcase', lib = 'glyphicon'), 
                  'blue')
     })
     
     output$recruitment <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'recruitment'], 
-                 'recruitment number', 
+                 '招聘信息数', 
                  icon('file-text'), 
                  'blue')
     })
     
     output$hr_plot <- renderDygraph({
-        dygraph(hr_data()) %>% 
+        dygraph(hr_data(), 
+                main = sprintf('%s变化趋势',
+                               switch(input$hr_data_type,
+                                      'new_user' = '新增个人用户',
+                                      'new_company' = '新增企业数', 
+                                      'new_recruitment' = '新增招聘信息数', 
+                                      'update_recruitment' = '刷新招聘信息数', 
+                                      'jobseekers_operation' = '个人用户操作数', 
+                                      'hr_operation' = '企业用户操作数'))) %>% 
+            dySeries(label = sprintf('%s',
+                                     switch(input$hr_data_type,
+                                            'new_user' = '新增个人用户',
+                                            'new_company' = '新增企业数', 
+                                            'new_recruitment' = '新增招聘信息数', 
+                                            'update_recruitment' = '刷新招聘信息数', 
+                                            'jobseekers_operation' = '个人用户操作数', 
+                                            'hr_operation' = '企业用户操作数'))) %>%
             dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'blue') %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$calendar_date_range)
@@ -242,27 +319,41 @@ shinyServer(function(input, output, session) {
     
     output$schedule_course <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'schedule_course'], 
-                 'schedule course number', 
+                 '累计课程数', 
                  icon('university'), 
                  'yellow')
     })
     
     output$upload_course_file <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'upload_course_file'], 
-                 'upload file number', 
+                 '上传课程文件数', 
                  icon('upload'), 
                  'yellow')
     })
     
     output$avg_course_user <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'avg_course_user'], 
-                 'average user per course', 
+                 '课程平均学习者数', 
                  icon('users'), 
                  'yellow')
     })
     
     output$schedule_plot <- renderDygraph({
-        dygraph(schedule_data()) %>% 
+        dygraph(schedule_data(), 
+                main = sprintf('%s变化趋势',
+                               switch(input$schedule_data_type,
+                                      'new_course' = '新增课程数',
+                                      'new_user' = '新增用户数', 
+                                      'active_user' = '活跃用户数', 
+                                      'new_file' = '新增课程文件数', 
+                                      'operation' = '操作数'))) %>% 
+            dySeries(label = sprintf('%s',
+                                     switch(input$schedule_data_type,
+                                            'new_course' = '新增课程数',
+                                            'new_user' = '新增用户数', 
+                                            'active_user' = '活跃用户数', 
+                                            'new_file' = '新增课程文件数', 
+                                            'operation' = '操作数'))) %>%
             dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'orange') %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$calendar_date_range)
@@ -275,34 +366,48 @@ shinyServer(function(input, output, session) {
     
     output$sell_info <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'sell_info'], 
-                 'sell information number', 
+                 '出售商品数', 
                  icon('mobile'), 
                  'maroon')
     })
     
     output$seller <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'seller'], 
-                 'seller number', 
+                 '累计卖家数', 
                  icon('users'), 
                  'maroon')
     })
     
     output$purchase_info <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'purchase_info'], 
-                 'purchase information number', 
+                 '求购信息数', 
                  icon('laptop'), 
                  'maroon')
     })
     
     output$purchaser <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'purchaser'], 
-                 'buyer number', 
+                 '累计买家数', 
                  icon('users'), 
                  'maroon')
     })
     
     output$trade_plot <- renderDygraph({
-        dygraph(trade_data()) %>% 
+        dygraph(trade_data(), 
+                main = sprintf('%s变化趋势',
+                               switch(input$trade_data_type,
+                                      'new_sell_info' = '新增出售商品数',
+                                      'new_buy_info' = '新增求购信息数', 
+                                      'active_seller' = '活跃卖家数', 
+                                      'active_buyer' = '活跃买家数', 
+                                      'active_trader' = '活跃用户数'))) %>% 
+            dySeries(label = sprintf('%s',
+                                     switch(input$trade_data_type,
+                                            'new_sell_info' = '新增出售商品数',
+                                            'new_buy_info' = '新增求购信息数', 
+                                            'active_seller' = '活跃卖家数', 
+                                            'active_buyer' = '活跃买家数', 
+                                            'active_trader' = '活跃用户数'))) %>%
             dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'maroon') %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$calendar_date_range)
@@ -315,27 +420,45 @@ shinyServer(function(input, output, session) {
     
     output$train_company <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'train_company'], 
-                 'company number', 
+                 '累计企业数', 
                  icon('briefcase', lib = 'glyphicon'), 
                  'purple')
     })
     
     output$train_course <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'train_course'], 
-                 'course number', 
+                 '培训课程数', 
                  icon('book'), 
                  'purple')
     })
     
     output$train_user <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'train_user'], 
-                 'user number', 
+                 '累计用户数', 
                  icon('users'), 
                  'purple')
     })
     
     output$train_plot <- renderDygraph({
-        dygraph(train_data()) %>% 
+        dygraph(train_data(), 
+                main = sprintf('%s变化趋势',
+                               switch(input$train_data_type,
+                                      'new_company' = '活跃企业数',
+                                      'new_course' = '新增培训课程数', 
+                                      'active_user' = '活跃用户数', 
+                                      'new_view' = '浏览数', 
+                                      'new_collect' = '收藏数', 
+                                      'new_apply' = '申请数', 
+                                      'new_contact' = '联系数'))) %>% 
+            dySeries(label = sprintf('%s',
+                                     switch(input$train_data_type,
+                                            'new_company' = '活跃企业数',
+                                            'new_course' = '新增培训课程数', 
+                                            'active_user' = '活跃用户数', 
+                                            'new_view' = '浏览数', 
+                                            'new_collect' = '收藏数', 
+                                            'new_apply' = '申请数', 
+                                            'new_contact' = '联系数'))) %>%
             dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'purple') %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$calendar_date_range)

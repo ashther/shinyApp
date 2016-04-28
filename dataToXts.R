@@ -227,8 +227,8 @@ daily_schedule_active_user <- xts(daily_schedule$active_user, order.by = daily_s
 names(daily_schedule_active_user) <- 'active_user'
 daily_schedule_new_file <- xts(daily_schedule$new_file, order.by = daily_schedule$date_time)
 names(daily_schedule_new_file) <- 'new_file'
-daily_schedule_oepration <- xts(daily_schedule$operation, order.by = daily_schedule$date_time)
-names(daily_schedule_oepration) <- 'operation'
+daily_schedule_operation <- xts(daily_schedule$operation, order.by = daily_schedule$date_time)
+names(daily_schedule_operation) <- 'operation'
 
 weekly_schedule_new_course <- xts(weekly_schedule$new_course, order.by = weekly_schedule$date_time)
 names(weekly_schedule_new_course) <- 'new_course'

@@ -21,35 +21,70 @@ pointRefresh <- function(now, point_data, con) {
     return(point_data)
 }
 
-hourlyRefresh <- function(now, hourly_login, con) {
-    if (difftime(now, max(hourly_login$date_time), units = 'hours') < 1.1) {
-        return(hourly_login)
+# hourlyRefresh <- function(now, hourly_login, con) {
+#     if (difftime(now, max(hourly_login$date_time), units = 'hours') < 1.1) {
+#         return(hourly_login)
+#     }
+#     
+#     hourly_login_new <- dbSendQuery(
+#         con, 
+#         paste0(
+#             'select * from hourly.login where date_time > ', 
+#             sprintf('\'%s\'', format(max(hourly_login$date_time), '%Y-%m-%d-%H')), 
+#             ';'
+#         )
+#     ) %>% 
+#         dbFetch(n = -1)
+#     
+#     hourly_login_new$date_time <- strptime(hourly_login_new$date_time,
+#                                            format = '%Y-%m-%d-%H') %>% as.POSIXct()
+#     temp_hr <- as.POSIXlt(now)
+#     temp_hr$hour <- temp_hr$hour - 1
+#     hr <- data.frame(date_time = seq(from = max(hourly_login$date_time), 
+#                                      to = as.POSIXct(format(temp_hr, '%Y-%m-%d %H:00:00')), 
+#                                      by = 'hour'))
+#     
+#     hourly_login_new <- left_join(hr, hourly_login_new, by = 'date_time') %>% 
+#         select(date_time, new, active, login)
+#     hourly_login_new[is.na(hourly_login_new)] <- 0
+#     
+#     return(rbind(hourly_login, hourly_login_new[-1, ]))
+# }
+
+hourlyDataRefresh <- function(now, hourly_data, con) {
+    if (difftime(now, max(hourly_data$date_time), units = 'hours') < 1.1) {
+        return(hourly_data)
     }
     
-    hourly_login_new <- dbSendQuery(
+    hourly_data_new <- dbSendQuery(
         con, 
         paste0(
-            'select * from hourly.login where date_time > ', 
-            sprintf('\'%s\'', format(max(hourly_login$date_time), '%Y-%m-%d-%H')), 
+            'select * from ', 
+            sub('_', '.', deparse(substitute(hourly_data))), 
+            ' where date_time > ', 
+            sprintf('\'%s\'', format(max(hourly_data$date_time), '%Y-%m-%d-%H')), 
             ';'
         )
     ) %>% 
         dbFetch(n = -1)
     
-    hourly_login_new$date_time <- strptime(hourly_login_new$date_time,
+    hourly_data_new$date_time <- strptime(hourly_data_new$date_time,
                                            format = '%Y-%m-%d-%H') %>% as.POSIXct()
     temp_hr <- as.POSIXlt(now)
     temp_hr$hour <- temp_hr$hour - 1
-    hr <- data.frame(date_time = seq(from = max(hourly_login$date_time), 
+    hr <- data.frame(date_time = seq(from = max(hourly_data$date_time), 
                                      to = as.POSIXct(format(temp_hr, '%Y-%m-%d %H:00:00')), 
                                      by = 'hour'))
     
-    hourly_login_new <- left_join(hr, hourly_login_new, by = 'date_time') %>% 
-        select(date_time, new, active, login)
-    hourly_login_new[is.na(hourly_login_new)] <- 0
+    hourly_data_new <- left_join(hr, hourly_data_new, by = 'date_time') %>% 
+        select(-id, -time_stamp)
+    hourly_data_new[is.na(hourly_data_new)] <- 0
     
-    return(rbind(hourly_login, hourly_login_new[-1, ]))
+    return(rbind(hourly_data, hourly_data_new[-1, ]))
 }
+
+
+
 
 city_location <- read.csv('city_location.csv', stringsAsFactors = FALSE, 
                           row.names = NULL)
@@ -96,7 +131,7 @@ while (dbMoreResults(con)) {
 }
 dbClearResult(res)
 
-res <- dbSendQuery(con, 'select longitude, latitude from yz_app_trade_db.sell_commodity;')
+res <- dbSendQuery(con, 'select create_time, longitude, latitude from yz_app_trade_db.sell_commodity;')
 user_location <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
     dbNextResult(con)
@@ -535,14 +570,8 @@ monthly_train[is.na(monthly_train)] <- 0
 rm(dt, hr, wk, mt)
 
 #==============================================================================
-user_location <- na.omit(user_location) %>% 
-    mutate(longitude = round(as.numeric(longitude), 2), 
-           latitude = round(as.numeric(latitude), 2)) %>% 
-    group_by(longitude, latitude) %>% 
-    summarise(n = n()) %>% 
-    ungroup() %>% 
-    arrange(desc(n)) %>% 
-    as.data.frame()
+user_location <- na.omit(user_location)
+user_location$create_time <- as.Date(user_location$create_time)
 
 
 

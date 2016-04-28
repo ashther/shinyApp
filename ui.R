@@ -9,33 +9,33 @@ source('dataSource.R')
 shinyUI(dashboardPage(
     skin = 'black', 
     
-    dashboardHeader(title = 'data analysis'), 
+    dashboardHeader(title = '数据分析'), 
     
     dashboardSidebar(
         
         sidebarMenu(
-            menuItem('Login', 
+            menuItem('用户规模及质量', 
                      tabName = 'login', 
                      icon = icon('dashboard')),
-            menuItem('Quick_chat', 
+            menuItem('快信', 
                      tabName = 'quick_chat', 
                      icon = icon('weixin')), 
-            menuItem('calendar', 
+            menuItem('勤务表', 
                      tabName = 'calendar', 
                      icon = icon('calendar')), 
-            menuItem('cooperation', 
+            menuItem('找合作', 
                      tabName = 'cooperation', 
                      icon = icon('github')), 
-            menuItem('hr', 
+            menuItem('找工作', 
                      tabName = 'hr', 
                      icon = icon('linkedin')), 
-            menuItem('schedule', 
+            menuItem('软课表', 
                      tabName = 'schedule', 
                      icon = icon('university')), 
-            menuItem('trade', 
+            menuItem('自贸区', 
                      tabName = 'trade', 
                      icon = icon('rmb')), 
-            menuItem('train', 
+            menuItem('找培训', 
                      tabName = 'train', 
                      icon = icon('stack-overflow'))
         )
@@ -73,29 +73,29 @@ shinyUI(dashboardPage(
                         
                         # 小时/日/周/月选项
                         box(selectInput('login_date_format', 
-                                        label = 'select time format', 
-                                        choices = list('hourly' = 'hourly', 
-                                                       'daily' = 'daily', 
-                                                       'weekly' = 'weekly', 
-                                                       'monthly' = 'monthly'), 
+                                        label = '选择统计周期', 
+                                        choices = list('小时' = 'hourly', 
+                                                       '日' = 'daily', 
+                                                       '周' = 'weekly', 
+                                                       '月' = 'monthly'), 
                                         selected = 'hourly'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 数据类型选项
                         box(selectInput('login_data_type', 
-                                        label = 'select data type', 
-                                        choices = list('new' = 'new',
-                                                       'active' = 'active', 
-                                                       'login' = 'log_in', 
-                                                       'retention' = 'retention'), 
+                                        label = '选择指标', 
+                                        choices = list('新增用户数' = 'new',
+                                                       '活跃用户数' = 'active', 
+                                                       '登陆次数' = 'log_in', 
+                                                       '留存率' = 'retention'), 
                                         selected = 'active'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 时间范围选项
                         box(dateRangeInput('login_date_range', 
-                                           label = 'select date range', 
+                                           label = '选择统计区间', 
                                            min = min(daily_login$date_time), 
                                            max = max(daily_login$date_time), 
                                            start = Sys.Date() - 1, 
@@ -103,13 +103,16 @@ shinyUI(dashboardPage(
                             width = NULL, 
                             solidHeader = TRUE),
                         
-                        helpText(paste0('NOTE: when date format is weekly/monthly, ', 
-                                        'the plot begins at the first weekday/monthday and ', 
-                                        'ends at the last weekday/monthday of date range selected, ', 
-                                        'and \'2016-04-11\' means the week between 2016.4.11 to 2016.4.18, ', 
-                                        '\'2016-04-01\' means the month between 2016.4.1 to 2016.4.30.' ))
+                        p(helpText(paste0('注意：当统计周期为周/月时， ', 
+                                        '图的横坐标开始于所选周/月的第一天，表示当周/月，', 
+                                        '如统计周期为周时，2016-04-11表示4月11日-18日这一周， ', 
+                                        '而统计周期为月时，2016-04-01表示4月' )), 
+                          style = 'font-size:85%')
                     )
                 ), 
+                
+                br(),
+                br(),
                 
                 #第三行，日登陆频次统计
                 fluidRow(
@@ -128,15 +131,15 @@ shinyUI(dashboardPage(
                         
                         # 数据类型（暂时仅为日登陆频次）
                         box(selectInput('login_data_type_freq', 
-                                        label = 'select data type', 
-                                        choices = list('frequency' = 'daily_freq'), 
+                                        label = '选择指标', 
+                                        choices = list('日登陆频次' = 'daily_freq'), 
                                         selected = 'daily_freq'), 
                             width = NULL,
                             solidHeader = TRUE), 
                         
                         # 时间范围选项
                         box(dateRangeInput('login_date_range_freq', 
-                                           label = 'select date range', 
+                                           label = '选择统计区间', 
                                            min = min(daily_login$date_time), 
                                            max = max(daily_login$date_time), 
                                            start = min(daily_login$date_time), 
@@ -146,18 +149,21 @@ shinyUI(dashboardPage(
                         
                         # 绘图多选选项
                         box(checkboxGroupInput('login_freq_type', 
-                                               label = 'select frequency type', 
-                                               choices = list('50+' = '50', 
-                                                              '>=20 & <50' = '20', 
-                                                              '>=10 & <20' = '10',
-                                                              '>=6 & <10' = '6',
-                                                              '>=3 & <6' = '3',
-                                                              '>=1 & <3' = '1'), 
+                                               label = '选择频次区间', 
+                                               choices = list('大于等于50次' = '50', 
+                                                              '20-49次' = '20', 
+                                                              '10-19次' = '10',
+                                                              '6-9次' = '6',
+                                                              '3-5次' = '3',
+                                                              '1-2次' = '1'), 
                                                selected = '1'), 
                             width = NULL, 
                             solidHeader = TRUE)
                     )
                 ), 
+                
+                br(), 
+                br(),
                 
                 #第四行，地图
                 fluidRow(
@@ -176,7 +182,7 @@ shinyUI(dashboardPage(
                         
                         # 省份选项
                         box(selectInput('province', 
-                                        'select a province', 
+                                        '选择省级地区', 
                                         choices = province_with_quote %>% 
                                             paste0(., '=', .) %>% 
                                             paste(collapse = ',') %>% 
@@ -189,9 +195,19 @@ shinyUI(dashboardPage(
                         
                         # 城市选项
                         box(selectInput('city', 
-                                        'select a city', 
+                                        '选择市级地区', 
                                         choices = list('西安市' = '西安市'), 
                                         selected = '西安市'), 
+                            width = NULL, 
+                            solidHeader = TRUE), 
+                        
+                        # 日期选项
+                        box(dateRangeInput('map_date_range', 
+                                           label = '选择统计区间', 
+                                           min = min(user_location$create_time), 
+                                           max = max(user_location$create_time), 
+                                           start = min(user_location$create_time), 
+                                           language = 'zh-CN'), 
                             width = NULL, 
                             solidHeader = TRUE)
                     )
@@ -226,6 +242,9 @@ shinyUI(dashboardPage(
                     valueBoxOutput('avg_circle_user', width = 3)
                 ), 
                 
+                br(), 
+                br(),
+                
                 fluidRow(
                     
                     column(
@@ -241,28 +260,28 @@ shinyUI(dashboardPage(
                         
                         # 小时/日/周/月选项
                         box(selectInput('quick_chat_date_format', 
-                                        label = 'select time format', 
-                                        choices = list('hourly' = 'hourly', 
-                                                       'daily' = 'daily', 
-                                                       'weekly' = 'weekly', 
-                                                       'monthly' = 'monthly'), 
+                                        label = '选择统计周期', 
+                                        choices = list('小时' = 'hourly', 
+                                                       '日' = 'daily', 
+                                                       '周' = 'weekly', 
+                                                       '月' = 'monthly'), 
                                         selected = 'hourly'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 数据类型选项
                         box(selectInput('quick_chat_data_type', 
-                                        label = 'select data type', 
-                                        choices = list('active cirle' = 'active_circle', 
-                                                       'message' = 'message', 
-                                                       'active user' = 'active_user'), 
+                                        label = '选择指标', 
+                                        choices = list('活跃圈子数' = 'active_circle', 
+                                                       '消息数' = 'message', 
+                                                       '活跃用户数' = 'active_user'), 
                                         selected = 'message'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 时间范围选项
                         box(dateRangeInput('quick_chat_date_range', 
-                                           label = 'select date range', 
+                                           label = '选择统计区间', 
                                            min = min(daily_login$date_time), 
                                            max = max(daily_login$date_time), 
                                            start = min(daily_login$date_time), 
@@ -270,11 +289,11 @@ shinyUI(dashboardPage(
                             width = NULL, 
                             solidHeader = TRUE),
                         
-                        helpText(paste0('NOTE: when date format is weekly/monthly, ', 
-                                        'the plot begins at the first weekday/monthday and ', 
-                                        'ends at the last weekday/monthday of date range selected, ', 
-                                        'and \'2016-04-11\' means the week between 2016.4.11 to 2016.4.18, ', 
-                                        '\'2016-04-01\' means the month between 2016.4.1 to 2016.4.30.' ))
+                        p(helpText(paste0('注意：当统计周期为周/月时， ', 
+                                          '图的横坐标开始于所选周/月的第一天，表示当周/月，', 
+                                          '如统计周期为周时，2016-04-11表示4月11日-18日这一周， ', 
+                                          '而统计周期为月时，2016-04-01表示4月' )), 
+                          style = 'font-size:85%')
                     )
                 )
             ), 
@@ -302,27 +321,27 @@ shinyUI(dashboardPage(
                         
                         # 小时/日/周/月选项
                         box(selectInput('calendar_date_format', 
-                                        label = 'select time format', 
-                                        choices = list('hourly' = 'hourly', 
-                                                       'daily' = 'daily', 
-                                                       'weekly' = 'weekly', 
-                                                       'monthly' = 'monthly'), 
+                                        label = '选择统计周期', 
+                                        choices = list('小时' = 'hourly', 
+                                                       '日' = 'daily', 
+                                                       '周' = 'weekly', 
+                                                       '月' = 'monthly'), 
                                         selected = 'daily'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 数据类型选项
                         box(selectInput('calendar_data_type', 
-                                        label = 'select data type', 
-                                        choices = list('new activity' = 'new_activity', 
-                                                       'new user' = 'new_user'), 
+                                        label = '选择指标', 
+                                        choices = list('新增活动数' = 'new_activity', 
+                                                       '新增用户数' = 'new_user'), 
                                         selected = 'new_user'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 时间范围选项
                         box(dateRangeInput('calendar_date_range', 
-                                           label = 'select date range', 
+                                           label = '选择统计区间', 
                                            min = min(daily_login$date_time), 
                                            max = max(daily_login$date_time), 
                                            start = min(daily_login$date_time), 
@@ -330,11 +349,11 @@ shinyUI(dashboardPage(
                             width = NULL, 
                             solidHeader = TRUE),
                         
-                        helpText(paste0('NOTE: when date format is weekly/monthly, ', 
-                                        'the plot begins at the first weekday/monthday and ', 
-                                        'ends at the last weekday/monthday of date range selected, ', 
-                                        'and \'2016-04-11\' means the week between 2016.4.11 to 2016.4.18, ', 
-                                        '\'2016-04-01\' means the month between 2016.4.1 to 2016.4.30.' ))
+                        p(helpText(paste0('注意：当统计周期为周/月时， ', 
+                                          '图的横坐标开始于所选周/月的第一天，表示当周/月，', 
+                                          '如统计周期为周时，2016-04-11表示4月11日-18日这一周， ', 
+                                          '而统计周期为月时，2016-04-01表示4月' )), 
+                          style = 'font-size:85%')
                     )
                 )
             ), 
@@ -363,31 +382,31 @@ shinyUI(dashboardPage(
                         
                         # 小时/日/周/月选项
                         box(selectInput('cooperation_date_format', 
-                                        label = 'select time format', 
-                                        choices = list('hourly' = 'hourly', 
-                                                       'daily' = 'daily', 
-                                                       'weekly' = 'weekly', 
-                                                       'monthly' = 'monthly'), 
+                                        label = '寻找统计周期', 
+                                        choices = list('小时' = 'hourly', 
+                                                       '日' = 'daily', 
+                                                       '周' = 'weekly', 
+                                                       '月' = 'monthly'), 
                                         selected = 'daily'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 数据类型选项
                         box(selectInput('cooperation_data_type', 
-                                        label = 'select data type', 
-                                        choices = list('new company' = 'new_company',
-                                                       'new project' = 'new_project', 
-                                                       'active user' = 'active_user', 
-                                                       'new view' = 'new_view', 
-                                                       'new collect' = 'new_collect', 
-                                                       'new apply' = 'new_apply'), 
+                                        label = '选择指标', 
+                                        choices = list('活跃企业数' = 'new_company',
+                                                       '新增项目数' = 'new_project', 
+                                                       '活跃用户数' = 'active_user', 
+                                                       '浏览数' = 'new_view', 
+                                                       '收藏数' = 'new_collect', 
+                                                       '申请数' = 'new_apply'), 
                                         selected = 'active_user'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 时间范围选项
                         box(dateRangeInput('calendar_date_range', 
-                                           label = 'select date range', 
+                                           label = '选择统计区间', 
                                            min = min(daily_login$date_time), 
                                            max = max(daily_login$date_time), 
                                            start = min(daily_login$date_time), 
@@ -395,11 +414,11 @@ shinyUI(dashboardPage(
                             width = NULL, 
                             solidHeader = TRUE),
                         
-                        helpText(paste0('NOTE: when date format is weekly/monthly, ', 
-                                        'the plot begins at the first weekday/monthday and ', 
-                                        'ends at the last weekday/monthday of date range selected, ', 
-                                        'and \'2016-04-11\' means the week between 2016.4.11 to 2016.4.18, ', 
-                                        '\'2016-04-01\' means the month between 2016.4.1 to 2016.4.30.' ))
+                        p(helpText(paste0('注意：当统计周期为周/月时， ', 
+                                          '图的横坐标开始于所选周/月的第一天，表示当周/月，', 
+                                          '如统计周期为周时，2016-04-11表示4月11日-18日这一周， ', 
+                                          '而统计周期为月时，2016-04-01表示4月' )), 
+                          style = 'font-size:85%')
                     )
                 )
             ), 
@@ -428,31 +447,31 @@ shinyUI(dashboardPage(
                         
                         # 小时/日/周/月选项
                         box(selectInput('hr_date_format', 
-                                        label = 'select time format', 
-                                        choices = list('hourly' = 'hourly', 
-                                                       'daily' = 'daily', 
-                                                       'weekly' = 'weekly', 
-                                                       'monthly' = 'monthly'), 
+                                        label = '选择统计周期', 
+                                        choices = list('小时' = 'hourly', 
+                                                       '日' = 'daily', 
+                                                       '周' = 'weekly', 
+                                                       '月' = 'monthly'), 
                                         selected = 'daily'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 数据类型选项
                         box(selectInput('hr_data_type', 
-                                        label = 'select data type', 
-                                        choices = list('new user' = 'new_user', 
-                                                       'new company' = 'new_company', 
-                                                       'new recruitment' = 'new_recruitment', 
-                                                       'update recruitment' = 'update_recruitment', 
-                                                       'jobseekers operation' = 'jobseekers_operation', 
-                                                       'hr operation' = 'hr_operation'), 
+                                        label = '选择指标', 
+                                        choices = list('新增个人用户' = 'new_user', 
+                                                       '新增企业数' = 'new_company', 
+                                                       '新增招聘信息数' = 'new_recruitment', 
+                                                       '刷新招聘信息数' = 'update_recruitment', 
+                                                       '个人用户操作数' = 'jobseekers_operation', 
+                                                       '企业用户操作数' = 'hr_operation'), 
                                         selected = 'new_user'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 时间范围选项
                         box(dateRangeInput('hr_date_range', 
-                                           label = 'select date range', 
+                                           label = '选择统计区间', 
                                            min = min(daily_login$date_time), 
                                            max = max(daily_login$date_time), 
                                            start = min(daily_login$date_time), 
@@ -460,11 +479,11 @@ shinyUI(dashboardPage(
                             width = NULL, 
                             solidHeader = TRUE),
                         
-                        helpText(paste0('NOTE: when date format is weekly/monthly, ', 
-                                        'the plot begins at the first weekday/monthday and ', 
-                                        'ends at the last weekday/monthday of date range selected, ', 
-                                        'and \'2016-04-11\' means the week between 2016.4.11 to 2016.4.18, ', 
-                                        '\'2016-04-01\' means the month between 2016.4.1 to 2016.4.30.' ))
+                        p(helpText(paste0('注意：当统计周期为周/月时， ', 
+                                          '图的横坐标开始于所选周/月的第一天，表示当周/月，', 
+                                          '如统计周期为周时，2016-04-11表示4月11日-18日这一周， ', 
+                                          '而统计周期为月时，2016-04-01表示4月' )), 
+                          style = 'font-size:85%')
                     )
                 )
             ), 
@@ -493,30 +512,30 @@ shinyUI(dashboardPage(
                         
                         # 小时/日/周/月选项
                         box(selectInput('schedule_date_format', 
-                                        label = 'select time format', 
-                                        choices = list('hourly' = 'hourly', 
-                                                       'daily' = 'daily', 
-                                                       'weekly' = 'weekly', 
-                                                       'monthly' = 'monthly'), 
+                                        label = '选择统计周期', 
+                                        choices = list('小时' = 'hourly', 
+                                                       '日' = 'daily', 
+                                                       '周' = 'weekly', 
+                                                       '月' = 'monthly'), 
                                         selected = 'daily'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 数据类型选项
                         box(selectInput('schedule_data_type', 
-                                        label = 'select data type', 
-                                        choices = list('new course' = 'new_course',
-                                                       'new user' = 'new_user', 
-                                                       'active user' = 'active_user', 
-                                                       'new file' = 'new_file', 
-                                                       'operation' = 'operation'), 
+                                        label = '选择指标', 
+                                        choices = list('新增课程数' = 'new_course',
+                                                       '新增用户数' = 'new_user', 
+                                                       '活跃用户数' = 'active_user', 
+                                                       '新增课程文件数' = 'new_file', 
+                                                       '操作数' = 'operation'), 
                                         selected = 'new_user'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 时间范围选项
                         box(dateRangeInput('schedule_date_range', 
-                                           label = 'select date range', 
+                                           label = '选择统计区间', 
                                            min = min(daily_login$date_time), 
                                            max = max(daily_login$date_time), 
                                            start = min(daily_login$date_time), 
@@ -524,11 +543,11 @@ shinyUI(dashboardPage(
                             width = NULL, 
                             solidHeader = TRUE),
                         
-                        helpText(paste0('NOTE: when date format is weekly/monthly, ', 
-                                        'the plot begins at the first weekday/monthday and ', 
-                                        'ends at the last weekday/monthday of date range selected, ', 
-                                        'and \'2016-04-11\' means the week between 2016.4.11 to 2016.4.18, ', 
-                                        '\'2016-04-01\' means the month between 2016.4.1 to 2016.4.30.' ))
+                        p(helpText(paste0('注意：当统计周期为周/月时， ', 
+                                          '图的横坐标开始于所选周/月的第一天，表示当周/月，', 
+                                          '如统计周期为周时，2016-04-11表示4月11日-18日这一周， ', 
+                                          '而统计周期为月时，2016-04-01表示4月' )), 
+                          style = 'font-size:85%')
                     )
                 )
             ), 
@@ -558,30 +577,30 @@ shinyUI(dashboardPage(
                         
                         # 小时/日/周/月选项
                         box(selectInput('trade_date_format', 
-                                        label = 'select time format', 
-                                        choices = list('hourly' = 'hourly', 
-                                                       'daily' = 'daily', 
-                                                       'weekly' = 'weekly', 
-                                                       'monthly' = 'monthly'), 
+                                        label = '选择统计周期', 
+                                        choices = list('小时' = 'hourly', 
+                                                       '日' = 'daily', 
+                                                       '周' = 'weekly', 
+                                                       '月' = 'monthly'), 
                                         selected = 'daily'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 数据类型选项
                         box(selectInput('trade_data_type', 
-                                        label = 'select data type', 
-                                        choices = list('new sell information' = 'new_sell_info',
-                                                       'new buy information' = 'new_buy_info', 
-                                                       'active seller' = 'active_seller', 
-                                                       'active buyer' = 'new_buyer', 
-                                                       'active trader' = 'active_trader'), 
+                                        label = '选择指标', 
+                                        choices = list('新增出售商品数' = 'new_sell_info',
+                                                       '新增求购信息数' = 'new_buy_info', 
+                                                       '活跃卖家数' = 'active_seller', 
+                                                       '活跃买家数' = 'active_buyer', 
+                                                       '活跃用户数' = 'active_trader'), 
                                         selected = 'active_trader'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 时间范围选项
                         box(dateRangeInput('trade_date_range', 
-                                           label = 'select date range', 
+                                           label = '选择统计区间', 
                                            min = min(daily_login$date_time), 
                                            max = max(daily_login$date_time), 
                                            start = min(daily_login$date_time), 
@@ -589,11 +608,11 @@ shinyUI(dashboardPage(
                             width = NULL, 
                             solidHeader = TRUE),
                         
-                        helpText(paste0('NOTE: when date format is weekly/monthly, ', 
-                                        'the plot begins at the first weekday/monthday and ', 
-                                        'ends at the last weekday/monthday of date range selected, ', 
-                                        'and \'2016-04-11\' means the week between 2016.4.11 to 2016.4.18, ', 
-                                        '\'2016-04-01\' means the month between 2016.4.1 to 2016.4.30.' ))
+                        p(helpText(paste0('注意：当统计周期为周/月时， ', 
+                                          '图的横坐标开始于所选周/月的第一天，表示当周/月，', 
+                                          '如统计周期为周时，2016-04-11表示4月11日-18日这一周， ', 
+                                          '而统计周期为月时，2016-04-01表示4月' )), 
+                          style = 'font-size:85%')
                     )
                 )
             ), 
@@ -622,32 +641,32 @@ shinyUI(dashboardPage(
                         
                         # 小时/日/周/月选项
                         box(selectInput('train_date_format', 
-                                        label = 'select time format', 
-                                        choices = list('hourly' = 'hourly', 
-                                                       'daily' = 'daily', 
-                                                       'weekly' = 'weekly', 
-                                                       'monthly' = 'monthly'), 
+                                        label = '选择统计周期', 
+                                        choices = list('小时' = 'hourly', 
+                                                       '日' = 'daily', 
+                                                       '周' = 'weekly', 
+                                                       '月' = 'monthly'), 
                                         selected = 'daily'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 数据类型选项
                         box(selectInput('train_data_type', 
-                                        label = 'select data type', 
-                                        choices = list('new company' = 'new_company', 
-                                                       'new course' = 'new_course', 
-                                                       'active user' = 'active_user', 
-                                                       'new view' = 'new_view', 
-                                                       'new collect' = 'new_collect', 
-                                                       'new apply' = 'new_apply', 
-                                                       'new contact' = 'new_contact'), 
+                                        label = '选择指标', 
+                                        choices = list('活跃企业数' = 'new_company', 
+                                                       '新增培训课程数' = 'new_course', 
+                                                       '活跃用户数' = 'active_user', 
+                                                       '浏览数' = 'new_view', 
+                                                       '收藏数' = 'new_collect', 
+                                                       '申请数' = 'new_apply', 
+                                                       '联系数' = 'new_contact'), 
                                         selected = 'active_user'), 
                             width = NULL, 
                             solidHeader = TRUE), 
                         
                         # 时间范围选项
                         box(dateRangeInput('train_date_range', 
-                                           label = 'select date range', 
+                                           label = '选择统计区间', 
                                            min = min(daily_login$date_time), 
                                            max = max(daily_login$date_time), 
                                            start = min(daily_login$date_time), 
@@ -655,11 +674,11 @@ shinyUI(dashboardPage(
                             width = NULL, 
                             solidHeader = TRUE),
                         
-                        helpText(paste0('NOTE: when date format is weekly/monthly, ', 
-                                        'the plot begins at the first weekday/monthday and ', 
-                                        'ends at the last weekday/monthday of date range selected, ', 
-                                        'and \'2016-04-11\' means the week between 2016.4.11 to 2016.4.18, ', 
-                                        '\'2016-04-01\' means the month between 2016.4.1 to 2016.4.30.' ))
+                        p(helpText(paste0('注意：当统计周期为周/月时， ', 
+                                          '图的横坐标开始于所选周/月的第一天，表示当周/月，', 
+                                          '如统计周期为周时，2016-04-11表示4月11日-18日这一周， ', 
+                                          '而统计周期为月时，2016-04-01表示4月' )), 
+                          style = 'font-size:85%')
                     )
                 )
             )

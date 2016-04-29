@@ -59,7 +59,9 @@ hourlyDataRefresh <- function(now, hourly_data, con) {
     hourly_data_new <- dbSendQuery(
         con, 
         paste0(
-            'select * from ', 
+            'select ', 
+            paste(colnames(hourly_data), collapse = ','), 
+            ' from ', 
             sub('_', '.', deparse(substitute(hourly_data))), 
             ' where date_time > ', 
             sprintf('\'%s\'', format(max(hourly_data$date_time), '%Y-%m-%d-%H')), 
@@ -76,8 +78,7 @@ hourlyDataRefresh <- function(now, hourly_data, con) {
                                      to = as.POSIXct(format(temp_hr, '%Y-%m-%d %H:00:00')), 
                                      by = 'hour'))
     
-    hourly_data_new <- left_join(hr, hourly_data_new, by = 'date_time') %>% 
-        select(-id, -time_stamp)
+    hourly_data_new <- left_join(hr, hourly_data_new, by = 'date_time')
     hourly_data_new[is.na(hourly_data_new)] <- 0
     
     return(rbind(hourly_data, hourly_data_new[-1, ]))

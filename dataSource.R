@@ -486,7 +486,7 @@ hourly_train[is.na(hourly_train)] <- 0
 # =============================================================================
 
 wk <- data.frame(first_weekday = seq(from = min(weekly_login$first_weekday),
-                                     to = Sys.Date() - 7,
+                                     to = max((Sys.Date() - 7), min(weekly_login$first_weekday)),
                                      by = 'week')) %>% 
     mutate(year_week = paste0(format(first_weekday, '%Y'), '-', format(first_weekday, '%V')))
 weekly_login <- left_join(wk, weekly_login, c('first_weekday', 'year_week')) %>% 

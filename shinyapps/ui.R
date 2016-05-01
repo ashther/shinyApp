@@ -1,6 +1,6 @@
 
 shinyUI(fluidPage(
-    titlePanel('Wow! Face and emotion detectiong!'), 
+    titlePanel('诶 这不是小主么'), 
     
     sidebarLayout(
         sidebarPanel(
@@ -8,7 +8,9 @@ shinyUI(fluidPage(
         ), 
         
         mainPanel(
-            imageOutput('img_choose')
+            imageOutput('img_choose'), 
+            tableOutput('emotion_detect'), 
+            tableOutput('face_detect')
         )
     )
 ))

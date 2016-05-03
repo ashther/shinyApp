@@ -3,6 +3,8 @@ library(shinydashboard)
 library(dygraphs)
 library(xts)
 library(leaflet)
+library(ggplot2)
+library(plotly)
 
 source('dataSource.R')
 
@@ -157,57 +159,6 @@ shinyUI(dashboardPage(
                                                               '3-5次' = '3',
                                                               '1-2次' = '1'), 
                                                selected = '1'), 
-                            width = NULL, 
-                            solidHeader = TRUE)
-                    )
-                ), 
-                
-                br(), 
-                br(),
-                
-                #第四行，地图
-                fluidRow(
-                    
-                    # 第四行第一列，地图
-                    column(
-                        width = 8, 
-                        box(leafletOutput('user_location'), 
-                            width = NULL, 
-                            solidHeader = TRUE)
-                    ), 
-                    
-                    # 第四行第二列，地图选项
-                    column(
-                        width = 4, 
-                        
-                        # 省份选项
-                        box(selectInput('province', 
-                                        '选择省级地区', 
-                                        choices = province_with_quote %>% 
-                                            paste0(., '=', .) %>% 
-                                            paste(collapse = ',') %>% 
-                                            sprintf('list(%s)', .) %>% 
-                                            parse(text = .) %>% 
-                                            eval(), 
-                                        selected = '陕西省'), 
-                            width = NULL, 
-                            solidHeader = TRUE), 
-                        
-                        # 城市选项
-                        box(selectInput('city', 
-                                        '选择市级地区', 
-                                        choices = list('西安市' = '西安市'), 
-                                        selected = '西安市'), 
-                            width = NULL, 
-                            solidHeader = TRUE), 
-                        
-                        # 日期选项
-                        box(dateRangeInput('map_date_range', 
-                                           label = '选择统计区间', 
-                                           min = min(user_location$create_time), 
-                                           max = max(user_location$create_time), 
-                                           start = min(user_location$create_time), 
-                                           language = 'zh-CN'), 
                             width = NULL, 
                             solidHeader = TRUE)
                     )
@@ -493,7 +444,8 @@ shinyUI(dashboardPage(
                 
                 fluidRow(
                     valueBoxOutput('schedule_course', width = 3), 
-                    valueBoxOutput('upload_course_file', width = 3), 
+                    valueBoxOutput('schedule_courseware', width = 3),
+                    valueBoxOutput('schedule_homework', width = 3), 
                     valueBoxOutput('avg_course_user', width = 3)
                 ), 
                 
@@ -563,6 +515,13 @@ shinyUI(dashboardPage(
                 ), 
                 
                 fluidRow(
+                    valueBoxOutput('sell_median', width = 3), 
+                    valueBoxOutput('sell_mean', width = 3), 
+                    valueBoxOutput('buy_median', width = 3), 
+                    valueBoxOutput('buy_mean', width = 3)
+                ), 
+                
+                fluidRow(
                     
                     column(
                         width = 8, 
@@ -613,6 +572,110 @@ shinyUI(dashboardPage(
                                           '如统计周期为周时，2016-04-11表示4月11日-18日这一周， ', 
                                           '而统计周期为月时，2016-04-01表示4月' )), 
                           style = 'font-size:85%')
+                    )
+                ), 
+                
+                br(), 
+                br(), 
+                
+                fluidRow(
+                    
+                    column(
+                        width = 8, 
+                        box(plotOutput('trade_price'), 
+                            width = NULL,
+                            solidHeader = TRUE)
+                    ), 
+                    
+                    column(
+                        width = 4, 
+                        
+                        box(selectInput('price_type', 
+                                        '选择价格类别', 
+                                        choices = list('出售价格' = 'sell_price', 
+                                                       '求购价格' = 'buy_price'), 
+                                        selected = 'sell_price'), 
+                            width = NULL, 
+                            solidHeader = TRUE), 
+                        
+                        box(checkboxGroupInput('price_category', 
+                                               '选择商品类别', 
+                                               choices = list('图书/音像' = '图书/音像', 
+                                                              '文体户外' = '文体户外', 
+                                                              '生活用品' = '生活用品', 
+                                                              '小家电' = '小家电', 
+                                                              '电脑/配件' = '电脑/配件', 
+                                                              '数码产品' = '数码产品', 
+                                                              '手机' = '手机', 
+                                                              '其它' = '其它'), 
+                                               selected = '图书/音像'), 
+                            width = NULL, 
+                            solidHeader = TRUE), 
+                        
+                        box(sliderInput('price_binwidth', 
+                                        '选择价格组距', 
+                                        min = 1, 
+                                        max = 50, 
+                                        value = 5), 
+                            width = NULL, 
+                            solidHeader = TRUE), 
+                        
+                        box(checkboxInput('price_outlier', 
+                                          '是否去除异常价格', 
+                                          value = FALSE), 
+                            width = NULL, 
+                            solidHeader = TRUE)
+                    )
+                ), 
+                
+                br(), 
+                br(),
+                
+                #第四行，地图
+                fluidRow(
+                    
+                    # 第四行第一列，地图
+                    column(
+                        width = 8, 
+                        box(leafletOutput('user_location'), 
+                            width = NULL, 
+                            solidHeader = TRUE)
+                    ), 
+                    
+                    # 第四行第二列，地图选项
+                    column(
+                        width = 4, 
+                        
+                        # 省份选项
+                        box(selectInput('province', 
+                                        '选择省级地区', 
+                                        choices = province_with_quote %>% 
+                                            paste0(., '=', .) %>% 
+                                            paste(collapse = ',') %>% 
+                                            sprintf('list(%s)', .) %>% 
+                                            parse(text = .) %>% 
+                                            eval(), 
+                                        selected = '陕西省'), 
+                            width = NULL, 
+                            solidHeader = TRUE), 
+                        
+                        # 城市选项
+                        box(selectInput('city', 
+                                        '选择市级地区', 
+                                        choices = list('西安市' = '西安市'), 
+                                        selected = '西安市'), 
+                            width = NULL, 
+                            solidHeader = TRUE), 
+                        
+                        # 日期选项
+                        box(dateRangeInput('map_date_range', 
+                                           label = '选择统计区间', 
+                                           min = min(user_location$create_time), 
+                                           max = max(user_location$create_time), 
+                                           start = min(user_location$create_time), 
+                                           language = 'zh-CN'), 
+                            width = NULL, 
+                            solidHeader = TRUE)
                     )
                 )
             ), 

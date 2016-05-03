@@ -324,9 +324,16 @@ shinyServer(function(input, output, session) {
                  'yellow')
     })
     
-    output$upload_course_file <- renderValueBox({
-        valueBox(point_data$value[point_data$item == 'upload_course_file'], 
-                 '上传课程文件数', 
+    output$schedule_courseware <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'schedule_courseware'], 
+                 '累计课件数', 
+                 icon('upload'), 
+                 'yellow')
+    })
+    
+    output$schedule_homework <- renderValueBox({
+        valueBox(point_data$value[point_data$item == 'schedule_homework'], 
+                 '累计作业数', 
                  icon('upload'), 
                  'yellow')
     })
@@ -364,6 +371,20 @@ shinyServer(function(input, output, session) {
         get(paste(input$trade_date_format, 'trade', input$trade_data_type, sep = '_'))
     })
     
+    price_data <- reactive({
+        price_data_temp <- subset(get(input$price_type), type %in% input$price_category)
+        
+        if (input$price_outlier) {
+            price_data_temp <- 
+                subset(price_data_temp, 
+                       price <= quantile(sell_price$price, 0.75) + 1.5 * IQR(sell_price$price) &
+                           price >= quantile(sell_price$price, 0.25) - 1.5 * IQR(sell_price$price))
+            
+        }
+        
+        return(price_data_temp)
+    })
+    
     output$sell_info <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'sell_info'], 
                  '出售商品数', 
@@ -392,6 +413,34 @@ shinyServer(function(input, output, session) {
                  'maroon')
     })
     
+    output$sell_median <- renderValueBox({
+        valueBox(median(sell_price$price), 
+                 '出售价格价中位数', 
+                 icon('rmb'), 
+                 'maroon')
+    })
+    
+    output$sell_mean <- renderValueBox({
+        valueBox(round(mean(sell_price$price), 2), 
+                 '出售价格平均数', 
+                 icon('rmb'), 
+                 'maroon')
+    })
+    
+    output$buy_median <- renderValueBox({
+        valueBox(median(buy_price$price), 
+                 '求购价格中位数', 
+                 icon('rmb'), 
+                 'maroon')
+    })
+    
+    output$buy_mean <- renderValueBox({
+        valueBox(round(mean(buy_price$price), 2), 
+                 '求购价格平均数', 
+                 icon('rmb'), 
+                 'maroon')
+    })
+    
     output$trade_plot <- renderDygraph({
         dygraph(trade_data(), 
                 main = sprintf('%s变化趋势',
@@ -411,6 +460,17 @@ shinyServer(function(input, output, session) {
             dyOptions(fillGraph = TRUE, fillAlpha = 0.2, colors = 'maroon') %>% 
             dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
             dyRangeSelector(dateWindow = input$calendar_date_range)
+    })
+    
+    output$trade_price <- renderPlot({
+        
+        ggplot(price_data(), aes(x = price, fill = type)) + 
+            geom_histogram(alpha = 0.5, binwidth = input$price_binwidth) + 
+            xlab('price(yuan)') + 
+            ylab('information') + 
+            ggtitle(sprintf('%s', switch(input$price_type,
+                                            'sell_price' = 'sell price',
+                                            'buy_price' = 'buy price')))
     })
     
     # train ===============================================================

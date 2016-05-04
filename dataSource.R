@@ -339,28 +339,22 @@ while (dbMoreResults(con)) {
 }
 dbClearResult(res)
 
-res <- dbSendQuery(con, paste0('SELECT b.category_name AS type, price ', 
-                               'FROM yz_app_trade_db.sell_commodity AS a ', 
-                               'LEFT JOIN yz_app_trade_db.commodity_category AS b ', 
-                               'ON a.commodity_category = b.category_code ', 
-                               'WHERE a.del_status = 0 ', 
-                               'AND b.del_status = 0 ',  
-                               'AND a.account_id >= 20000 ', 
-                               'AND a.commodity_status = 1;'))
+res <- dbSendQuery(con, paste0('SELECT commodity_category AS type, price ', 
+                               'FROM yz_app_trade_db.sell_commodity ', 
+                               'WHERE del_status = 0 ', 
+                               'AND account_id >= 20000 ',  
+                               'AND commodity_status = 1;'))
 sell_price <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
     dbNextResult(con)
 }
 dbClearResult(res)
 
-res <- dbSendQuery(con, paste0('SELECT b.category_name AS type, price ', 
-                               'FROM yz_app_trade_db.purchase_commodity AS a ', 
-                               'LEFT JOIN yz_app_trade_db.commodity_category AS b ', 
-                               'ON a.commodity_category = b.category_code ', 
-                               'WHERE a.del_status = 0 ', 
-                               'AND b.del_status = 0 ',  
-                               'AND a.account_id >= 20000 ', 
-                               'AND a.commodity_status = 1;'))
+res <- dbSendQuery(con, paste0('SELECT commodity_category AS type, price ', 
+                               'FROM yz_app_trade_db.purchase_commodity ', 
+                               'WHERE del_status = 0 ', 
+                               'AND account_id >= 20000 ',  
+                               'AND commodity_status = 1;'))
 buy_price <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
     dbNextResult(con)

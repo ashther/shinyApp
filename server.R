@@ -57,12 +57,14 @@ shinyServer(function(input, output, session) {
                  '累计用户数', 
                  icon('users'))
     })
+    
     # 当日新增用户数
     output$new_user_today <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'new_user'], 
                  '当日新增用户数', 
                  icon('user-plus'))
     })
+    
     # 当日活跃用户数
     output$active_user_today <- renderValueBox({
         valueBox(point_data$value[point_data$item == 'active_user'], 
@@ -467,7 +469,6 @@ shinyServer(function(input, output, session) {
         ggplot(price_data(), aes(x = price, fill = type)) + 
             geom_histogram(alpha = 0.5, binwidth = input$price_binwidth) + 
             xlab('price(yuan)') + 
-            ylab('information') + 
             ggtitle(sprintf('%s', switch(input$price_type,
                                             'sell_price' = 'sell price',
                                             'buy_price' = 'buy price')))

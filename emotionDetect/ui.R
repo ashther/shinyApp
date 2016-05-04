@@ -1,6 +1,8 @@
 
+library(dplyr)
+
 shinyUI(fluidPage(
-    titlePanel('诶 这不是小主么'), 
+    titlePanel('wow, this is for you'), 
     
     sidebarLayout(
         sidebarPanel(

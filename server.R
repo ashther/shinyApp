@@ -464,14 +464,25 @@ shinyServer(function(input, output, session) {
             dyRangeSelector(dateWindow = input$calendar_date_range)
     })
     
+    # output$trade_price <- renderPlotly({
+    #     
+    #     (ggplot(price_data(), aes(x = price, fill = type)) + 
+    #          geom_histogram(alpha = 0.5, binwidth = input$price_binwidth) + 
+    #          xlab('价格（元）') + 
+    #          ylab('商品信息数') + 
+    #      ggtitle(sprintf('%s分布', switch(input$price_type,
+    #                                     'sell_price' = '出售价格',
+    #                                     'buy_price' = '求购价格')))) %>% 
+    #         ggplotly()
+    # })
     output$trade_price <- renderPlot({
         
         ggplot(price_data(), aes(x = price, fill = type)) + 
             geom_histogram(alpha = 0.5, binwidth = input$price_binwidth) + 
             xlab('price(yuan)') + 
             ggtitle(sprintf('%s', switch(input$price_type,
-                                            'sell_price' = 'sell price',
-                                            'buy_price' = 'buy price')))
+                                           'sell_price' = 'sell price',
+                                           'buy_price' = 'purchase price')))
     })
     
     # train ===============================================================

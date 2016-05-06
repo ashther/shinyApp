@@ -4,11 +4,11 @@ library(RMySQL)
 library(dplyr)
 library(tidyr)
 
-host <- '117.34.109.230'
-port <- 33077
-username <- 'thinkcoo'
-password <- 'tko123456'
-dbname <- 'yz_sys_db'
+host <- ''
+port <- 
+username <- ''
+password <- ''
+dbname <- ''
 
 con <- dbConnect(MySQL(), host = host, port = port, 
                  username = username, password = password, 

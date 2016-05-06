@@ -610,8 +610,8 @@ monthly_train <- left_join(mt, monthly_train, c('first_monthday', 'year_month_id
            new_apply, new_contact)
 monthly_train[is.na(monthly_train)] <- 0
 
-rm(dt, hr, wk, mt)
 
+rm(dt, hr, wk, mt)
 #==============================================================================
 user_location <- na.omit(user_location)
 user_location$create_time <- as.Date(user_location$create_time)
@@ -619,15 +619,6 @@ user_location$create_time <- as.Date(user_location$create_time)
 # =============================================================================
 sell_price$price <- as.numeric(sell_price$price)
 buy_price$price <- as.numeric(buy_price$price)
-
-
-
-
-
-
-
-
-
 
 
 

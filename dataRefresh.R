@@ -16,5 +16,6 @@ hourly_schedule <- hourlyDataRefresh(Sys.time(), hourly_schedule, con)
 hourly_trade <- hourlyDataRefresh(Sys.time(), hourly_trade, con)
 hourly_train <- hourlyDataRefresh(Sys.time(), hourly_train, con)
 
+
 dbDisconnect(con)
 rm(con)

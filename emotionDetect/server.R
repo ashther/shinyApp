@@ -12,9 +12,9 @@ shinyServer(function(input, output, session) {
     output$img_choose <- renderImage({
         
         # width <- session$clientData$output_myImage_width
-        width <- '100'
+        # width <- '100'
         # height <- session$clientData$output_myImage_height
-        height <- '133'
+        # height <- '133'
         
         infile <- input$img
         
@@ -23,8 +23,8 @@ shinyServer(function(input, output, session) {
         }
         
         list(src = infile$datapath,
-             width = width, 
-             height = height, 
+             # width = width, 
+             # height = height, 
              alt = 'test title')
     }, deleteFile = FALSE)
     
@@ -42,17 +42,20 @@ shinyServer(function(input, output, session) {
                    '惊讶' = scores.surprise) %>% 
             t()
         
-        temp <- data.frame(emotion = rownames(temp), percent = temp, row.names = NULL, stringsAsFactors = FALSE)
+        temp <- data.frame(emotion = rownames(temp), 
+                           percent = temp, row.names = NULL, 
+                           stringsAsFactors = FALSE)
         
-        return(iconv(cbind(表情 = temp[, 1], 百分比 = round(temp[, 2] / sum(temp[, 2]) * 100, 2)), from = 'utf-8'))
+        return(iconv(cbind(表情 = temp[, 1], 
+                             百分比 = round(temp[, 2] / sum(temp[, 2]) * 100, 2)), 
+                     from = 'utf-8'))
     })
     
     output$face_detect <- renderTable({
         infile <- input$img
         
         temp <- getFaceResponse(infile$datapath, faceKey) %>% 
-            select('微笑特征' = faceAttributes.smile, 
-                   '年龄' = faceAttributes.age) %>% 
+            select('年龄' = faceAttributes.age) %>% 
             t()
     })
 })

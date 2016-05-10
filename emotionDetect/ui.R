@@ -6,7 +6,7 @@ shinyUI(fluidPage(
     
     sidebarLayout(
         sidebarPanel(
-            fileInput('img', 'choose a picture')
+            fileInput('img', '选张照片吧')
         ), 
         
         mainPanel(

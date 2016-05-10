@@ -574,12 +574,12 @@ shinyUI(dashboardPage(
                 fluidRow(
                     tags$div(title = '有效出售商品的价格中位数', 
                              valueBoxOutput('sell_median', width = 3)),
-                    tags$div(title = '有效的出售商品的价格平均数', 
-                             valueBoxOutput('sell_mean', width = 3)),
+                    
                     tags$div(title = '有效的求购商品的价格中位数', 
-                             valueBoxOutput('buy_median', width = 3)),
-                    tags$div(title = '有效的求购商品的价格平均数', 
-                             valueBoxOutput('buy_mean', width = 3))
+                             valueBoxOutput('buy_median', width = 3)), 
+                    
+                    tags$div(title = '有效的出售和求购商品价格之和', 
+                             valueBoxOutput('sell_buy_total', width = 6))
                 ), 
                 
                 fluidRow(

@@ -417,28 +417,28 @@ shinyServer(function(input, output, session) {
     
     output$sell_median <- renderValueBox({
         valueBox(median(sell_price$price), 
-                 '出售价格价中位数', 
+                 '出售价格价中位数（元）', 
                  icon('rmb'), 
                  'maroon')
     })
     
-    output$sell_mean <- renderValueBox({
-        valueBox(round(mean(sell_price$price), 2), 
-                 '出售价格平均数', 
+    output$sell_buy_total <- renderValueBox({
+        sell_ratio <- round(sum(sell_price$price) / sum(sell_price$price, buy_price$price), 4) * 100
+        buy_ratio <- 100 - sell_ratio
+        
+        valueBox(round(sum(sell_price$price, buy_price$price)/1e4, 2), 
+                 paste0('自贸区总规模（万元），出售商品占', 
+                        sprintf('%s', sell_ratio), 
+                        '%，求购商品占', 
+                        sprintf('%s', buy_ratio), 
+                        '%'),
                  icon('rmb'), 
                  'maroon')
     })
     
     output$buy_median <- renderValueBox({
         valueBox(median(buy_price$price), 
-                 '求购价格中位数', 
-                 icon('rmb'), 
-                 'maroon')
-    })
-    
-    output$buy_mean <- renderValueBox({
-        valueBox(round(mean(buy_price$price), 2), 
-                 '求购价格平均数', 
+                 '求购价格中位数（元）', 
                  icon('rmb'), 
                  'maroon')
     })

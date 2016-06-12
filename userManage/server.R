@@ -1,7 +1,8 @@
 
-library(RMySQL)
 source('www/dataSource.R', local = TRUE)
-user_passwd <- data.frame(user = 'slj', passwd = '123456', stringsAsFactors = FALSE)
+user_passwd <- data.frame(user = c('sunlj', 'zhoumn', 'zhangp'), 
+                          passwd = c('sunlj', 'zhoumn', 'zhangp'), 
+                          stringsAsFactors = FALSE)
 logged <- FALSE
 
 shinyServer(function(input, output, session) {
@@ -12,30 +13,94 @@ shinyServer(function(input, output, session) {
     
     observe({
         if (login_data$logged == TRUE) {
-            output$field <- renderUI({
+            output$field_ui <- renderUI({
                 checkboxGroupInput(
-                    'field', 
-                    '选择其他需要的字段', 
+                    inputId = 'field', 
+                    label = '可选字段', 
                     choices = list('用户名' = 'b.full_name as \'用户名\'', 
                                    '单位/学校' = 'GROUP_CONCAT(c.position_1name) AS \'单位/学校\'', 
                                    '手机号' = 'a.username AS \'手机号\'', 
                                    '最后登录时间' = 'a.last_login_time AS \'最后登录时间\''), 
                     selected = c('b.full_name as \'用户名\'', 
-                                 'GROUP_CONCAT(c.position_1name) AS \'单位/学校\'')
+                                 'GROUP_CONCAT(c.position_1name) AS \'单位/学校\'', 
+                                 'a.username AS \'手机号\'', 
+                                 'a.last_login_time AS \'最后登录时间\'')
                 )
             })
             
-            output$date <- renderUI({
+            output$date_ui <- renderUI({
                 dateRangeInput(
-                    'date', 
-                    '选择注册时间', 
+                    inputId = 'date', 
+                    label = '选择注册时间', 
+                    min = '2016-04-28', 
+                    max = Sys.Date(), 
                     start = '2016-04-28', 
-                    end = Sys.Date() + 1
+                    end = Sys.Date(), 
+                    language = 'zh-CN'
                 )
+            })
+            
+            output$button_ui <- renderUI({
+                actionButton(inputId = 'select_button', 
+                             label = '查询')
+            })
+
+            output$download_ui <- renderUI({
+                downloadButton('download', '下载')
+            })
+            
+            output$download <- downloadHandler(
+                filename = function() {
+                    paste0(format(Sys.time(), '%Y%m%d_%H%M%S'), '.csv')
+                }, 
+                content = function(file) {
+                    temp <- user_regist_data() 
+ 		    colnames(temp) <- iconv(colnames(temp), 'utf-8', 'gbk') 
+                    write.csv(sapply(temp, function(x){iconv(x, 'utf-8', 'gbk')}), file)
+                }
+            )
+            
+            output$head_n_ui <- renderUI({
+                numericInput('head_n', '选择预览行数', 5, 
+                             min = 1, max = 20, step = 1, width = '15%')
+            })
+            
+            user_regist_data <- eventReactive(input$select_button, {
+                c('a.id', input$field, 'a.regist_time AS \'注册时间\'') %>%
+                    paste(collapse = ',') %>% 
+                    paste('select', ., 'FROM yz_sys_db.ps_account AS a
+LEFT JOIN yz_app_person_db.ps_attribute_variety AS b ON a.id = b.account_id
+                          AND a.del_status = 0
+                          AND b.del_status = 0
+                          LEFT JOIN
+                          (SELECT account_id,
+                          position_1name
+                          FROM
+                          (SELECT account_id,
+                          position_1name,
+                          status_time
+                          FROM yz_app_person_db.ps_vitae_main
+                          WHERE del_status = 0
+                          ORDER BY status_time DESC) AS ps_vitae_main_temp
+                          GROUP BY account_id) AS c ON a.id = c.account_id
+                          WHERE a.id > 20000
+                          AND b.full_name IS NOT NULL 
+                          AND a.regist_time BETWEEN',
+                          sprintf('\'%s\'', input$date[1]), 
+                          'AND DATE_ADD(', 
+                          sprintf('\'%s\'', input$date[2]), 
+                          ', INTERVAL 1 DAY) GROUP BY a.id;', 
+                          sep = ' '
+                          ) %>% 
+                    dataGet()
+            })
+            
+            output$nrow <- renderText({
+                sprintf('共有%s行数据', nrow(user_regist_data()))
             })
             
             output$user_regist_table <- renderTable({
-                
+                tail(user_regist_data(), input$head_n)
             })
         }
     })

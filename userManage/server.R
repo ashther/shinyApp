@@ -83,7 +83,7 @@ LEFT JOIN yz_app_person_db.ps_attribute_variety AS b ON a.id = b.account_id
                           WHERE del_status = 0
                           ORDER BY status_time DESC) AS ps_vitae_main_temp
                           GROUP BY account_id) AS c ON a.id = c.account_id
-                          WHERE a.id > 20000
+                          WHERE a.id >= 20000
                           AND b.full_name IS NOT NULL 
                           AND a.regist_time BETWEEN',
                           sprintf('\'%s\'', input$date[1]), 

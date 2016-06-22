@@ -4,7 +4,6 @@ library(dygraphs)
 library(xts)
 library(leaflet)
 library(ggplot2)
-library(plotly)
 
 source('dataSource.R')
 
@@ -46,8 +45,6 @@ shinyUI(dashboardPage(
     
     dashboardBody(
         
-        # tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'), 
-        
         fluidRow(
             column(width = 3), 
             column(width = 4, 
@@ -68,7 +65,8 @@ shinyUI(dashboardPage(
                              valueBoxOutput('total_user', width = 3)), 
                     tags$div(title = '当日新注册用户数（按账号统计）', 
                              valueBoxOutput('new_user_today', width = 3)), 
-                    tags$div(title = '当日活跃用户（至少登陆过一次的用户）数', 
+                    tags$div(title = '当日活跃用户（至少登陆过一次的用户）数，
+                             括号内为存量（非今日新增）用户所占比例', 
                              valueBoxOutput('active_user_today', width = 3)),
                     tags$div(title = '当日所有用户登录应用的总次数', 
                              valueBoxOutput('login_times_today', width = 3))
@@ -78,49 +76,22 @@ shinyUI(dashboardPage(
                     dygraphOutput('hourly_login_plot')
                 ), 
                 
+                br(), 
+                br(), 
+                
                 # 第二行，历史用户数据
                 fluidRow(
                     
                     # 第二行第一列，历史数据图
                     column(
                         width = 8, 
-                        # box(dygraphOutput('login_plot_1'), 
-                        #     width = NULL, 
-                        #     solidHeader = TRUE)
                         dygraphOutput('login_plot_1')
                     ), 
                     
                     # 第二行第二列，绘图选项
                     column(
                         width = 4, 
-                        
-                        # 小时/日/周/月选项
-                        # box(selectInput('login_date_format', 
-                        #                 label = '选择统计周期', 
-                        #                 choices = list('小时' = 'hourly', 
-                        #                                '日' = 'daily', 
-                        #                                '周' = 'weekly', 
-                        #                                '月' = 'monthly'), 
-                        #                 selected = 'hourly'), 
-                        #     width = NULL, 
-                        #     solidHeader = TRUE), 
                         uiOutput('login_date_format_render'), 
-                        
-                        # 数据类型选项
-                        # box(tags$div(title = paste0('新增用户数、活跃用户数、登陆次数', 
-                        #                             '均为所选统计周期内的时段数据', 
-                        #                             '当统计周期为日时，留存率为次日留存率；', 
-                        #                             '当统计周期为周时，留存率为7日内留存率，与第7日留存率并不相同；', 
-                        #                             '当统计周期为月时，留存率为30日内留存率，与第30日留存率并不相同'),
-                        #              selectInput('login_data_type', 
-                        #                          label = '选择指标', 
-                        #                          choices = list('新增用户数' = 'new',
-                        #                                         '活跃用户数' = 'active', 
-                        #                                         '登陆次数' = 'log_in', 
-                        #                                         '留存率' = 'retention'), 
-                        #                          selected = 'active')), 
-                        #     width = NULL, 
-                        #     solidHeader = TRUE), 
                         
                         tags$div(title = paste0('新增用户数、活跃用户数、登陆次数', 
                                                 '均为所选统计周期内的时段数据', 
@@ -128,23 +99,9 @@ shinyUI(dashboardPage(
                                                 '当统计周期为周时，留存率为7日内留存率，与第7日留存率并不相同；', 
                                                 '当统计周期为月时，留存率为30日内留存率，与第30日留存率并不相同'),
                                  uiOutput('login_data_type_render')), 
-                        
-                        # 时间范围选项
-                        # box(dateRangeInput('login_date_range', 
-                        #                    label = '选择统计区间', 
-                        #                    min = min(daily_login$date_time), 
-                        #                    max = max(daily_login$date_time), 
-                        #                    start = Sys.Date() - 1, 
-                        #                    language = 'zh-CN'), 
-                        #     width = NULL, 
-                        #     solidHeader = TRUE),
+
                         uiOutput('login_date_range_render'), 
                         
-                        # p(helpText(paste0('注意：当统计周期为周/月时， ', 
-                        #                   '图的横坐标开始于所选周/月的第一天，表示当周/月，', 
-                        #                   '如统计周期为周时，2016-04-11表示4月11日-18日这一周， ', 
-                        #                   '而统计周期为月时，2016-04-01表示4月' )), 
-                        #   style = 'font-size:85%')
                         uiOutput('login_help_text')
                     )
                 ), 
@@ -158,9 +115,6 @@ shinyUI(dashboardPage(
                     # 第三行第一列，日登陆频次图
                     column(
                         width = 8, 
-                        # box(dygraphOutput('login_plot_2'), 
-                        #     width = NULL, 
-                        #     solidHeader = TRUE)
                         dygraphOutput('login_plot_2')
                     ), 
                     
@@ -169,37 +123,12 @@ shinyUI(dashboardPage(
                         width = 4, 
                         
                         # 数据类型（暂时仅为日登陆频次）
-                        # box(selectInput('login_data_type_freq', 
-                        #                 label = '选择指标', 
-                        #                 choices = list('日登陆频次' = 'daily_freq'), 
-                        #                 selected = 'daily_freq'), 
-                        #     width = NULL,
-                        #     solidHeader = TRUE), 
                         uiOutput('login_data_type_freq_render'), 
                         
                         # 时间范围选项
-                        # box(dateRangeInput('login_date_range_freq', 
-                        #                    label = '选择统计区间', 
-                        #                    min = min(daily_login$date_time), 
-                        #                    max = max(daily_login$date_time), 
-                        #                    start = Sys.Date() - 31, 
-                        #                    language = 'zh-CN'), 
-                        #     width = NULL, 
-                        #     solidHeader = TRUE), 
                         uiOutput('login_date_range_freq_render'), 
                         
                         # 绘图多选选项
-                        # box(checkboxGroupInput('login_freq_type', 
-                        #                        label = '选择频次区间', 
-                        #                        choices = list('大于等于50次' = '50', 
-                        #                                       '20-49次' = '20', 
-                        #                                       '10-19次' = '10',
-                        #                                       '6-9次' = '6',
-                        #                                       '3-5次' = '3',
-                        #                                       '1-2次' = '1'), 
-                        #                        selected = '1'), 
-                        #     width = NULL, 
-                        #     solidHeader = TRUE)
                         uiOutput('login_freq_type_render')
                     )
                 )
@@ -689,19 +618,6 @@ shinyUI(dashboardPage(
                                                selected = '1'),
                             width = NULL,
                             solidHeader = TRUE),
-                        # box(checkboxGroupInput('price_category', 
-                        #                        '选择商品类别', 
-                        #                        choices = list('图书/音像' = '图书/音像', 
-                        #                                       '文体户外' = '文体户外', 
-                        #                                       '生活用品' = '生活用品', 
-                        #                                       '小家电' = '小家电', 
-                        #                                       '电脑/配件' = '电脑/配件', 
-                        #                                       '数码产品' = '数码产品', 
-                        #                                       '手机' = '手机', 
-                        #                                       '其它' = '其它'), 
-                        #                        selected = '图书/音像'), 
-                        #     width = NULL, 
-                        #     solidHeader = TRUE), 
                         
                         box(tags$div(title = '价格被分成若干组以绘制直方图，组距为各小组两端点间的距离', 
                                      sliderInput('price_binwidth', 

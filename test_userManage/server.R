@@ -62,6 +62,94 @@ shinyServer(function(input, output, session) {
         }
     })
     
+    # demographic =============================================================
+    demographic_temp_data <- reactive({
+        if (input$demographic_university_select == '不限') {
+            temp <- subset(
+                demographic, regist_time >= as.POSIXct(input$demographic_dateRange_1[1]) & 
+                    regist_time <= as.POSIXct(input$demographic_dateRange_1[2])
+            ) 
+        } else {
+            temp <- subset(
+                demographic, university == input$demographic_university_select & 
+                    regist_time >= as.POSIXct(input$demographic_dateRange_1[1]) & 
+                    regist_time <= as.POSIXct(input$demographic_dateRange_1[2])
+            )
+        }
+        return(temp)
+    })
+    
+    demographic_age_data <- reactive({
+        
+        temp <- demographic_temp_data()
+        if (input$demographic_age_outlier) {
+            temp <- 
+                subset(temp, 
+                       age <= quantile(temp$age, 0.75, na.rm = TRUE) + 1.5 * IQR(temp$age, na.rm = TRUE) &
+                           age >= quantile(temp$age, 0.25, na.rm = TRUE) - 1.5 * IQR(temp$age, na.rm = TRUE))
+            
+        }
+        return(temp)
+    })
+    
+    demographic_degree_data <- reactive({
+        
+        temp <- demographic_temp_data()
+        if (input$demographic_degree_null) {
+            temp <- temp[!is.na(temp$degree), ]
+        }
+        temp <- temp %>% 
+            group_by(degree) %>% 
+            tally()
+        
+        temp$degree[temp$degree == '本科'] <- '4'
+        temp$degree[temp$degree == '硕士'] <- '3'
+        temp$degree[is.na(temp$degree)] <- 'NA'
+        return(temp)
+    })
+    
+    demographic_gender_data <- reactive({
+        
+        temp <- demographic_temp_data()
+        if (input$demographic_gender_null) {
+            temp <- temp[!is.na(temp$gender), ]
+        }
+        temp <- temp %>% 
+            group_by(gender) %>% 
+            tally()
+        
+        temp$gender[temp$gender == '男'] <- 'male'
+        temp$gender[temp$gender == '女'] <- 'female'
+        temp$gender[is.na(temp$gender)] <- 'NA'
+        return(temp)
+    })
+    
+    demographic_university_top10 <- reactive({
+        demographic %>% 
+            filter(!is.na(university) & 
+                       status_category == 1 & 
+                       regist_time >= as.POSIXct(input$demographic_dateRange_2[1]) & 
+                       regist_time <= as.POSIXct(input$demographic_dateRange_2[2])) %>% 
+            group_by(university) %>% 
+            summarise(n = n()) %>% 
+            ungroup() %>% 
+            mutate(r = rank(n, ties.method = 'random')) %>% 
+            top_n(10, r) %>% 
+            arrange(desc(r)) %>% 
+            select(university, n)
+    })
+    
+    demographic_heatmap_data <- reactive({
+        demographic[demographic$university %in% demographic_university_top10()$university, 
+                    c('university', 'degree')]
+    })
+    
+    observe({
+        if (login_check$logged == TRUE) {
+            source('renderOutput_demographic.R', encoding = 'utf-8', local = TRUE)
+        }
+    })
+    
     # quick_chat===============================================================
     quick_chat_data <- reactive({
         get(paste(input$quick_chat_date_format, 'quick_chat', input$quick_chat_data_type, sep = '_'))
@@ -73,8 +161,6 @@ shinyServer(function(input, output, session) {
             source('renderOutput_quick_chat.R', encoding = 'utf-8', local = TRUE)
         }
     })
-    
-    
     
     # calendar ===============================================================
     calendar_data <- reactive({
@@ -142,8 +228,8 @@ shinyServer(function(input, output, session) {
         if (input$price_outlier) {
             price_data_temp <- 
                 subset(price_data_temp, 
-                       price <= quantile(sell_price$price, 0.75) + 1.5 * IQR(sell_price$price) &
-                           price >= quantile(sell_price$price, 0.25) - 1.5 * IQR(sell_price$price))
+                       price <= quantile(sell_price$price, 0.75, na.rm = TRUE) + 1.5 * IQR(sell_price$price) &
+                           price >= quantile(sell_price$price, 0.25, na.rm = TRUE) - 1.5 * IQR(sell_price$price))
             
         }
         

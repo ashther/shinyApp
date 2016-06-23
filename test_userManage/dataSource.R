@@ -143,6 +143,41 @@ while (dbMoreResults(con)) {
 }
 dbClearResult(res)
 
+res <- dbSendQuery(con, paste0("SELECT a.id, 
+                               b.sex                                                   AS gender, 
+                               b.highest_education                                     AS degree, 
+                               Round(Timestampdiff(day, d.birth_date, Now()) / 365, 2) AS age, 
+                               c.position_1name                                        AS university, 
+                               c.status_category, 
+                               a.regist_time 
+                               FROM   yz_sys_db.ps_account AS a 
+                               LEFT JOIN yz_app_person_db.ps_attribute_variety AS b 
+                               ON a.id = b.account_id 
+                               AND b.del_status = 0 
+                               LEFT JOIN (SELECT account_id, 
+                               position_1name, 
+                               status_category 
+                               FROM   (SELECT account_id, 
+                               position_1name, 
+                               status_time, 
+                               status_category 
+                               FROM   yz_app_person_db.ps_vitae_main 
+                               WHERE  del_status = 0 
+                               ORDER  BY status_time DESC) AS ps_vitae_main_temp 
+                               GROUP  BY account_id) AS c 
+                               ON a.id = c.account_id 
+                               LEFT JOIN yz_app_person_db.ps_attribute_inva AS d 
+                               ON a.id = d.account_id 
+                               AND d.del_status = 0 
+                               WHERE  a.id >= 20000 
+                               AND a.del_status = 0; "))
+demographic <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+    dbNextResult(con)
+}
+dbClearResult(res)
+demographic$regist_time <- as.POSIXct(demographic$regist_time)
+
 res <- dbSendQuery(con, 'select * from daily.quick_chat;')
 daily_quick_chat <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
@@ -344,13 +379,13 @@ res <- dbSendQuery(con, paste0('SELECT commodity_category AS type, price ',
                                'WHERE del_status = 0 ',
                                'AND account_id >= 20000 ',
                                'AND commodity_status = 1;'))
-# res <- dbSendQuery(con, paste0('SELECT b.category_name as type, a.price ', 
-#                                'FROM yz_app_trade_db.sell_commodity AS a ', 
-#                                'INNER JOIN yz_app_trade_db.commodity_category AS b ', 
-#                                'ON a.commodity_category = b.category_code ',  
-#                                'WHERE a.del_status = 0 ',  
-#                                'AND a.account_id >= 20000 ', 
-#                                'AND a.commodity_status = 1 ', 
+# res <- dbSendQuery(con, paste0('SELECT b.category_name as type, a.price ',
+#                                'FROM yz_app_trade_db.sell_commodity AS a ',
+#                                'INNER JOIN yz_app_trade_db.commodity_category AS b ',
+#                                'ON a.commodity_category = b.category_code ',
+#                                'WHERE a.del_status = 0 ',
+#                                'AND a.account_id >= 20000 ',
+#                                'AND a.commodity_status = 1 ',
 #                                'AND b.del_status = 0;'))
 sell_price <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
@@ -363,13 +398,13 @@ res <- dbSendQuery(con, paste0('SELECT commodity_category AS type, price ',
                                'WHERE del_status = 0 ',
                                'AND account_id >= 20000 ',
                                'AND commodity_status = 1;'))
-# res <- dbSendQuery(con, paste0('SELECT b.category_name as type, a.price ', 
-#                                'FROM yz_app_trade_db.purchase_commodity AS a ', 
-#                                'INNER JOIN yz_app_trade_db.commodity_category AS b ', 
-#                                'ON a.commodity_category = b.category_code ',  
-#                                'WHERE a.del_status = 0 ',  
-#                                'AND a.account_id >= 20000 ', 
-#                                'AND a.commodity_status = 1 ', 
+# res <- dbSendQuery(con, paste0('SELECT b.category_name as type, a.price ',
+#                                'FROM yz_app_trade_db.purchase_commodity AS a ',
+#                                'INNER JOIN yz_app_trade_db.commodity_category AS b ',
+#                                'ON a.commodity_category = b.category_code ',
+#                                'WHERE a.del_status = 0 ',
+#                                'AND a.account_id >= 20000 ',
+#                                'AND a.commodity_status = 1 ',
 #                                'AND b.del_status = 0;'))
 buy_price <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {

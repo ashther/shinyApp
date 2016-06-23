@@ -19,6 +19,9 @@ shinyUI(dashboardPage(
             menuItem('用户规模及质量', 
                      tabName = 'login', 
                      icon = icon('dashboard')),
+            menuItem('用户属性统计', 
+                     tabName = 'demographic', 
+                     icon = icon('bar-chart')),
             menuItem('快信', 
                      tabName = 'quick_chat', 
                      icon = icon('weixin')), 
@@ -99,7 +102,7 @@ shinyUI(dashboardPage(
                                                 '当统计周期为周时，留存率为7日内留存率，与第7日留存率并不相同；', 
                                                 '当统计周期为月时，留存率为30日内留存率，与第30日留存率并不相同'),
                                  uiOutput('login_data_type_render')), 
-
+                        
                         uiOutput('login_date_range_render'), 
                         
                         uiOutput('login_help_text')
@@ -133,6 +136,83 @@ shinyUI(dashboardPage(
                     )
                 )
             ),
+            
+            tabItem(
+                tabName = 'demographic', 
+                
+                fluidRow(
+                    column(width = 9, 
+                           fluidRow(# 删除异常确定、年龄bar图
+                               box(tags$div(title = paste0('一组数据的上下四分位数之间的距离为IQR， ', 
+                                                           '通常将超过改组数据上下分位数1.5倍IQR的数据定为异常点'), 
+                                            checkboxInput('demographic_age_outlier', 
+                                                          '去除异常年龄', 
+                                                          value = TRUE)), 
+                                   width = NULL, 
+                                   solidHeader = TRUE), 
+                               
+                               box(plotOutput('demographic_age_plot'), 
+                                   width = NULL, 
+                                   solidHeader = TRUE)
+                           ), 
+                           fluidRow(
+                               column(width = 4, 
+                                      box(checkboxInput('demographic_gender_null', 
+                                                        '去除未填写', 
+                                                        value = TRUE), 
+                                          width = NULL, 
+                                          solidHeader = TRUE), 
+                                      
+                                      box(plotOutput('demographic_gender_plot'), 
+                                          width = NULL, 
+                                          solidHeader = TRUE)), # 删除异常确定、性别pie图
+                               column(width = 5, 
+                                      box(checkboxInput('demographic_degree_null', 
+                                                        '去除未填写项', 
+                                                        value = TRUE), 
+                                          width = NULL, 
+                                          solidHeader = TRUE), 
+                                      
+                                      box(plotOutput('demographic_degree_plot'), 
+                                          width = NULL, 
+                                          solidHeader = TRUE))# 删除异常确定、学历pie图
+                           )), 
+                    column(width = 3, 
+                           box(selectizeInput('demographic_university_select', 
+                                           '选择学校', 
+                                           c('不限', unique(demographic$university[demographic$status_category == 1]))), 
+                               width = NULL, 
+                               solidHeader = TRUE), # 学校选择
+                           box(dateRangeInput('demographic_dateRange_1', 
+                                              '选择用户注册时段', 
+                                              min = min(daily_login$date_time), 
+                                              max = max(daily_login$date_time), 
+                                              start = min(daily_login$date_time), 
+                                              end = max(daily_login$date_time), 
+                                              language = 'zh-CN'), 
+                               width = NULL, 
+                               solidHeader = TRUE)) # 注册日期选择
+                ), 
+                
+                fluidRow(
+                    column(width = 4, 
+                           box(plotOutput('demographic_university_top10'), 
+                               width = NULL, 
+                               solidHeader = TRUE)), # 学校top10
+                    column(width = 5, 
+                           box(plotOutput('demographic_heatmap'), 
+                               width = NULL, 
+                               solidHeader = TRUE)), # 学校学历热图
+                    column(width = 3, # 学校选择
+                           box(dateRangeInput('demographic_dateRange_2', 
+                                              '选择用户注册时段', 
+                                              min = min(daily_login$date_time), 
+                                              max = max(daily_login$date_time), 
+                                              language = 'zh-CN'), 
+                               width = NULL, 
+                               solidHeader = TRUE)) # 注册日期选择
+                )
+            ), 
             
             tabItem(
                 tabName = 'quick_chat',
@@ -589,7 +669,7 @@ shinyUI(dashboardPage(
                         box(plotOutput('trade_price'),
                             width = NULL,
                             solidHeader = TRUE)
-                        # box(plotlyOutput('trade_price'), 
+                        # box(plotlyOutput('trade_price'),
                         #     width = NULL,
                         #     solidHeader = TRUE)
                     ), 

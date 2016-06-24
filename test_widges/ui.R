@@ -1,25 +1,7 @@
 
+library(plotly)
+library(ggplot2)
 shinyUI(fluidPage(
-    titlePanel('censusVis'), 
-    
-    sidebarLayout(
-        sidebarPanel(
-            helpText('Create demographic maps with information from the 2010 US census.'), 
-            
-            selectInput('select', 'Choose a variable to display', 
-                        choices = list('Percent White', 
-                                       'Percent Black', 
-                                       'Percent Hispanic', 
-                                       'Percent Asian'), 
-                        selected = 'Percent White'), 
-            
-            sliderInput('slider', 'Range of interest: ', 
-                        min = 0, max = 100, value = c(0, 100))
-        ), 
-        
-        mainPanel(
-            textOutput('text_1'), 
-            textOutput('text_2')
-        )
-    )
+    numericInput('n', 'input', 10, min = 1, max = 100), 
+    plotlyOutput('p')
 ))

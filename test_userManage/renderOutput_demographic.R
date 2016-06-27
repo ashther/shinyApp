@@ -7,7 +7,7 @@ output$demographic_age_plot <- renderPlotly({
        sprintf('图1：%s年龄分布（核密度曲线',
                ifelse(input$demographic_university_select == '不限',
                       '全体用户',
-                      iconv(input$demographic_university_select,'utf-8', 'gbk')))
+                      input$demographic_university_select))
      )) %>%
     ggplotly()
 })
@@ -17,7 +17,11 @@ output$demographic_gender_plot <- renderPlotly({
           labels = gender, 
           values = n, 
           type = 'pie') %>% 
-    layout(title = '图2：性别占比')
+    layout(title = 
+             sprintf('图2：%s性别占比线',
+                     ifelse(input$demographic_university_select == '不限',
+                            '全体用户',
+                            input$demographic_university_select)))
 })
 
 output$demographic_degree_plot <- renderPlotly({
@@ -25,12 +29,23 @@ output$demographic_degree_plot <- renderPlotly({
           labels = degree, 
           values = n, 
           type = 'pie') %>% 
-    layout(title = '图3：学历占比')
+    layout(title = 
+             sprintf('图3：%s受教育程度占比',
+                     ifelse(input$demographic_university_select == '不限',
+                            '全体用户',
+                            input$demographic_university_select)))
 })
 
-output$test <- renderPrint({
-  sprintf('图1：%s年龄分布（核密度曲线）',
-          ifelse(input$demographic_university_select == '不限',
-                 '全体用户',
-                 input$demographic_university_select))
-}) # print_to_test
+output$demographic_university_top10 <- renderPlotly({
+  plot_ly(demographic_university_top10(), 
+          x = university, 
+          y = n, 
+          type = 'bar') %>% 
+    layout(title = '图4：用户所属院校TOP10', 
+           xaxis = list(title = '', 
+                        size = 10))
+})
+
+# output$test <- renderPrint({
+#   sprintf('%s, %s',input$demographic_dateRange_2[1], input$demographic_dateRange_2[2])
+# }) # print_to_test

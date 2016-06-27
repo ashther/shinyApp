@@ -1,6 +1,6 @@
 
-user_passwd <- data.frame(user = c('sunlj', 'zhoumn', 'zhangp', 'chenmq'), 
-              passwd = c('sunlj', 'zhoumn', 'zhangp', 'chenmq'), 
+user_passwd <- data.frame(user = c('sunlj', 'zhoumn', 'zhangp', 'chenmq', 'yyzx'), 
+              passwd = c('sunlj', 'zhoumn', 'zhangp', 'chenmq', 'yyzx123'), 
               stringsAsFactors = FALSE)
 logged <- FALSE
 
@@ -102,9 +102,13 @@ shinyServer(function(input, output, session) {
       group_by(degree) %>% 
       tally()
     
-    # temp$degree[temp$degree == '本科'] <- '4'
-    # temp$degree[temp$degree == '硕士'] <- '3'
-    # temp$degree[is.na(temp$degree)] <- 'NA'
+    temp$degree[temp$degree == '1'] <- '博士后'
+    temp$degree[temp$degree == '2'] <- '博士'
+    temp$degree[temp$degree == '3'] <- '硕士'
+    temp$degree[temp$degree == '4'] <- '本科'
+    temp$degree[temp$degree == '5'] <- '大专'
+    temp$degree[temp$degree == '6'] <- '高中/中专'
+    temp$degree[temp$degree == '7'] <- '初中及以下'
     return(temp)
   })
   
@@ -117,10 +121,7 @@ shinyServer(function(input, output, session) {
     temp <- temp %>% 
       group_by(gender) %>% 
       tally()
-    
-    # temp$gender[temp$gender == '男'] <- 'male'
-    # temp$gender[temp$gender == '女'] <- 'female'
-    # temp$gender[is.na(temp$gender)] <- 'NA'
+
     return(temp)
   })
   

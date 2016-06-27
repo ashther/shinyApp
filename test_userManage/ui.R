@@ -144,7 +144,8 @@ shinyUI(dashboardPage(
         fluidRow(
           column(width = 9, 
                  
-                 textOutput('test'), # print_to_test
+                 # # print_to_test
+                 # textOutput('test'),
                  
                fluidRow(# 删除异常确定、年龄bar图
                  box(tags$div(title = paste0('一组数据的上下四分位数之间的距离为IQR， ', 
@@ -153,7 +154,8 @@ shinyUI(dashboardPage(
                               '去除异常年龄', 
                               value = TRUE)), 
                    width = NULL, 
-                   solidHeader = TRUE), 
+                   solidHeader = TRUE, 
+                   background = 'red'), 
                  
                  box(plotlyOutput('demographic_age_plot'), 
                    width = NULL, 
@@ -162,29 +164,36 @@ shinyUI(dashboardPage(
                fluidRow(
                  column(width = 6, 
                     box(checkboxInput('demographic_gender_null', 
-                            '去除未填写', 
+                            '去除未填写性别的用户', 
                             value = TRUE), 
                       width = NULL, 
-                      solidHeader = TRUE), 
+                      solidHeader = TRUE, 
+                      background = 'red'), 
                     
                     box(plotlyOutput('demographic_gender_plot'), 
                       width = NULL, 
                       solidHeader = TRUE)), # 删除异常确定、性别pie图
                  column(width = 6, 
                     box(checkboxInput('demographic_degree_null', 
-                            '去除未填写项', 
+                            '去除未填写受教育程度的用户', 
                             value = TRUE), 
                       width = NULL, 
-                      solidHeader = TRUE), 
+                      solidHeader = TRUE, 
+                      background = 'red'), 
                     
                     box(plotlyOutput('demographic_degree_plot'), 
                       width = NULL, 
                       solidHeader = TRUE))# 删除异常确定、学历pie图
                )), 
           column(width = 3, 
-               box(selectizeInput('demographic_university_select', 
-                       '选择学校', 
-                       c('不限', unique(demographic$university[demographic$status_category == 1]))), 
+               box(selectizeInput(
+                 'demographic_university_select', 
+                 '选择学校', 
+                 c('不限', 
+                   na.omit(
+                     unique(demographic$university[demographic$status_category == 1])
+                   ))
+               ), 
                  width = NULL, 
                  solidHeader = TRUE), # 学校选择
                box(dateRangeInput('demographic_dateRange_1', 
@@ -201,23 +210,30 @@ shinyUI(dashboardPage(
                 
         ), 
         
+        br(), 
+        br(),
+        
         fluidRow(
-          column(width = 4, 
+          column(width = 9, 
                box(plotlyOutput('demographic_university_top10'), 
                  width = NULL, 
                  solidHeader = TRUE)), # 学校top10
-          column(width = 5, 
-               box(plotlyOutput('demographic_heatmap'), 
-                 width = NULL, 
-                 solidHeader = TRUE)), # 学校学历热图
+          # column(width = 4, 
+          #      box(plotlyOutput('demographic_heatmap'), 
+          #        width = NULL, 
+          #        solidHeader = TRUE)), # 学校学历热图
           column(width = 3, # 学校选择
                box(dateRangeInput('demographic_dateRange_2', 
                         '选择用户注册时段', 
                         min = min(daily_login$date_time), 
                         max = max(daily_login$date_time), 
+                        start = min(daily_login$date_time), 
+                        end = max(daily_login$date_time),
                         language = 'zh-CN'), 
                  width = NULL, 
-                 solidHeader = TRUE)) # 注册日期选择
+                 solidHeader = TRUE), 
+               p(helpText('选项对图4有效'), 
+                 style = 'font-size:85%')) # 注册日期选择
         )
       ), 
       
@@ -673,12 +689,12 @@ shinyUI(dashboardPage(
           
           column(
             width = 8, 
-            box(plotOutput('trade_price'),
-              width = NULL,
-              solidHeader = TRUE)
-            # box(plotlyOutput('trade_price'),
-            #     width = NULL,
-            #     solidHeader = TRUE)
+            # box(plotOutput('trade_price'),
+            #   width = NULL,
+            #   solidHeader = TRUE)
+            box(plotlyOutput('trade_price'),
+                width = NULL,
+                solidHeader = TRUE)
           ), 
           
           column(
@@ -694,34 +710,43 @@ shinyUI(dashboardPage(
             
             box(checkboxGroupInput('price_category',
                          '选择商品类别',
-                         choices = list('图书/音像：1' = '1',
-                                '文体户外：2' = '2',
-                                '生活用品：3' = '3',
-                                '小家电：4' = '4',
-                                '电脑/配件：5' = '5',
-                                '数码产品：6' = '6',
-                                '手机：32' = '32',
-                                '其它：7' = '7'),
-                         selected = '1'),
+                         # choices = list('图书/音像：1' = '1',
+                         #        '文体户外：2' = '2',
+                         #        '生活用品：3' = '3',
+                         #        '小家电：4' = '4',
+                         #        '电脑/配件：5' = '5',
+                         #        '数码产品：6' = '6',
+                         #        '手机：32' = '32',
+                         #        '其它：7' = '7'),
+                         choices = list('图书/音像' = '图书/音像',
+                                        '文体户外' = '文体户外',
+                                        '生活用品' = '生活用品',
+                                        '小家电' = '小家电',
+                                        '电脑/配件' = '电脑/配件',
+                                        '数码产品' = '数码产品',
+                                        '手机' = '手机',
+                                        '其它' = '其它'),
+                         selected = '图书/音像'),
               width = NULL,
               solidHeader = TRUE),
             
-            box(tags$div(title = '价格被分成若干组以绘制直方图，组距为各小组两端点间的距离', 
-                   sliderInput('price_binwidth', 
-                         '选择价格组距', 
-                         min = 1, 
-                         max = 50, 
-                         value = 5)), 
-              width = NULL, 
-              solidHeader = TRUE), 
+            # box(tags$div(title = '价格被分成若干组以绘制直方图，组距为各小组两端点间的距离', 
+            #        sliderInput('price_binwidth', 
+            #              '选择价格组距', 
+            #              min = 1, 
+            #              max = 50, 
+            #              value = 5)), 
+            #   width = NULL, 
+            #   solidHeader = TRUE), 
             
             box(tags$div(title = paste0('一组数据的上下四分位数之间的距离为IQR， ', 
                           '通常将超过改组数据上下分位数1.5倍IQR的数据定为异常点'), 
                    checkboxInput('price_outlier', 
                            '是否去除异常价格', 
-                           value = FALSE)), 
+                           value = TRUE)), 
               width = NULL, 
-              solidHeader = TRUE)
+              solidHeader = TRUE, 
+              background = 'red')
           )
         ), 
         

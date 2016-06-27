@@ -143,39 +143,50 @@ while (dbMoreResults(con)) {
 }
 dbClearResult(res)
 
-res <- dbSendQuery(con, paste0("SELECT a.id, 
-                               b.sex                                                   AS gender, 
-                               b.highest_education                                     AS degree, 
-                               Round(Timestampdiff(day, d.birth_date, Now()) / 365, 2) AS age, 
-                               c.position_1name                                        AS university, 
-                               c.status_category, 
-                               a.regist_time 
-                               FROM   yz_sys_db.ps_account AS a 
-                               LEFT JOIN yz_app_person_db.ps_attribute_variety AS b 
-                               ON a.id = b.account_id 
-                               AND b.del_status = 0 
-                               LEFT JOIN (SELECT account_id, 
-                               position_1name, 
-                               status_category 
-                               FROM   (SELECT account_id, 
-                               position_1name, 
-                               status_time, 
-                               status_category 
-                               FROM   yz_app_person_db.ps_vitae_main 
-                               WHERE  del_status = 0 
-                               ORDER  BY status_time DESC) AS ps_vitae_main_temp 
-                               GROUP  BY account_id) AS c 
-                               ON a.id = c.account_id 
-                               LEFT JOIN yz_app_person_db.ps_attribute_inva AS d 
-                               ON a.id = d.account_id 
-                               AND d.del_status = 0 
-                               WHERE  a.id >= 20000 
-                               AND a.del_status = 0; "))
+demographic_test_string <- paste0("SELECT a.id, ", 
+                                  "b.sex                              AS gender, ", 
+                                  "b.highest_education                AS degree, ", 
+                                  "Round(Timestampdiff(day, d.birth_date, Now()) / 365, 2) AS age, ", 
+                                  "c.position_1name                                        AS university, ", 
+                                  "c.status_category, ", 
+                                  "a.regist_time ", 
+                                  "FROM   yz_sys_db.ps_account AS a ", 
+                                  "LEFT JOIN (SELECT ps.account_id, ", 
+                                             "ps.sex, ", 
+                                             "Ifnull(pub.d_values, ps.highest_education) AS highest_education ", 
+                                             "FROM   yz_app_person_db.ps_attribute_variety AS ps ", 
+                                             "LEFT JOIN yz_public_db.pub_dictionary AS pub ", 
+                                             "ON ps.highest_education = pub.d_key ", 
+                                             "AND pub.del_status = 0 ", 
+                                             "AND pub.type = 'pub.学历' ", 
+                                             "WHERE  ps.del_status = 0) AS b ", 
+                                  "ON a.id = b.account_id ", 
+                                  "LEFT JOIN (SELECT account_id, ", 
+                                             "position_1name, ", 
+                                             "status_category ", 
+                                             "FROM   (SELECT account_id, ", 
+                                                     "position_1name, ", 
+                                                     "status_time, ", 
+                                                     "status_category ", 
+                                                     "FROM   yz_app_person_db.ps_vitae_main ", 
+                                                     "WHERE  del_status = 0 ", 
+                                                     "ORDER  BY status_time DESC) AS ps_vitae_main_temp ", 
+                                             "GROUP  BY account_id) AS c ", 
+                                  "ON a.id = c.account_id ", 
+                                  "LEFT JOIN yz_app_person_db.ps_attribute_inva AS d ", 
+                                  "ON a.id = d.account_id ", 
+                                  "AND d.del_status = 0 ", 
+                                  "WHERE  a.id >= 20000 ", 
+                                  "AND a.del_status = 0; ")
+res <- dbSendQuery(con, demographic_test_string)
 demographic <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
     dbNextResult(con)
 }
 dbClearResult(res)
+demographic$gender <- iconv(demographic$gender, 'gbk', 'utf-8')
+demographic$degree <- iconv(demographic$degree, 'gbk', 'utf-8')
+demographic$university <- iconv(demographic$university, 'gbk', 'utf-8')
 demographic$regist_time <- as.POSIXct(demographic$regist_time)
 
 res <- dbSendQuery(con, 'select * from daily.quick_chat;')
@@ -374,43 +385,45 @@ while (dbMoreResults(con)) {
 }
 dbClearResult(res)
 
-res <- dbSendQuery(con, paste0('SELECT commodity_category AS type, price ',
-                               'FROM yz_app_trade_db.sell_commodity ',
-                               'WHERE del_status = 0 ',
-                               'AND account_id >= 20000 ',
-                               'AND commodity_status = 1;'))
-# res <- dbSendQuery(con, paste0('SELECT b.category_name as type, a.price ',
-#                                'FROM yz_app_trade_db.sell_commodity AS a ',
-#                                'INNER JOIN yz_app_trade_db.commodity_category AS b ',
-#                                'ON a.commodity_category = b.category_code ',
-#                                'WHERE a.del_status = 0 ',
-#                                'AND a.account_id >= 20000 ',
-#                                'AND a.commodity_status = 1 ',
-#                                'AND b.del_status = 0;'))
+# res <- dbSendQuery(con, paste0('SELECT commodity_category AS type, price ',
+#                                'FROM yz_app_trade_db.sell_commodity ',
+#                                'WHERE del_status = 0 ',
+#                                'AND account_id >= 20000 ',
+#                                'AND commodity_status = 1;'))
+res <- dbSendQuery(con, paste0('SELECT b.category_name as type, a.price ',
+                               'FROM yz_app_trade_db.sell_commodity AS a ',
+                               'INNER JOIN yz_app_trade_db.commodity_category AS b ',
+                               'ON a.commodity_category = b.category_code ',
+                               'WHERE a.del_status = 0 ',
+                               'AND a.account_id >= 20000 ',
+                               'AND a.commodity_status = 1 ',
+                               'AND b.del_status = 0;'))
 sell_price <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
     dbNextResult(con)
 }
 dbClearResult(res)
+sell_price$type <- iconv(sell_price$type, 'gbk', 'utf8')
 
-res <- dbSendQuery(con, paste0('SELECT commodity_category AS type, price ',
-                               'FROM yz_app_trade_db.purchase_commodity ',
-                               'WHERE del_status = 0 ',
-                               'AND account_id >= 20000 ',
-                               'AND commodity_status = 1;'))
-# res <- dbSendQuery(con, paste0('SELECT b.category_name as type, a.price ',
-#                                'FROM yz_app_trade_db.purchase_commodity AS a ',
-#                                'INNER JOIN yz_app_trade_db.commodity_category AS b ',
-#                                'ON a.commodity_category = b.category_code ',
-#                                'WHERE a.del_status = 0 ',
-#                                'AND a.account_id >= 20000 ',
-#                                'AND a.commodity_status = 1 ',
-#                                'AND b.del_status = 0;'))
+# res <- dbSendQuery(con, paste0('SELECT commodity_category AS type, price ',
+#                                'FROM yz_app_trade_db.purchase_commodity ',
+#                                'WHERE del_status = 0 ',
+#                                'AND account_id >= 20000 ',
+#                                'AND commodity_status = 1;'))
+res <- dbSendQuery(con, paste0('SELECT b.category_name as type, a.price ',
+                               'FROM yz_app_trade_db.purchase_commodity AS a ',
+                               'INNER JOIN yz_app_trade_db.commodity_category AS b ',
+                               'ON a.commodity_category = b.category_code ',
+                               'WHERE a.del_status = 0 ',
+                               'AND a.account_id >= 20000 ',
+                               'AND a.commodity_status = 1 ',
+                               'AND b.del_status = 0;'))
 buy_price <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
     dbNextResult(con)
 }
 dbClearResult(res)
+buy_price$type <- iconv(buy_price$type, 'gbk', 'utf8')
 
 dbDisconnect(con)
 

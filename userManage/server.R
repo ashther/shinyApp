@@ -1,7 +1,7 @@
 
 source('www/dataSource.R', local = TRUE)
-user_passwd <- data.frame(user = c('sunlj', 'zhoumn', 'zhangp'), 
-                          passwd = c('sunlj', 'zhoumn', 'zhangp'), 
+user_passwd <- data.frame(user = c('sunlj', 'zhoumn', 'zhangp', 'chenmq'), 
+                          passwd = c('sunlj', 'zhoumn', 'zhangp', 'chenmq'), 
                           stringsAsFactors = FALSE)
 logged <- FALSE
 
@@ -26,6 +26,14 @@ shinyServer(function(input, output, session) {
                                  'a.username AS \'手机号\'', 
                                  'a.last_login_time AS \'最后登录时间\'')
                 )
+            })
+            
+            output$phone_field_ui <- renderUI({
+              checkboxInput(
+                inputId = 'phone_field', 
+                label = '用户手机归属地（需要用户手机号）', 
+                value = TRUE
+              )
             })
             
             output$date_ui <- renderUI({
@@ -66,11 +74,10 @@ shinyServer(function(input, output, session) {
             })
             
             user_regist_data <- eventReactive(input$select_button, {
-                c('a.id', input$field, 'a.regist_time AS \'注册时间\'') %>%
-                    paste(collapse = ',') %>% 
-                    paste('select', ., 'FROM yz_sys_db.ps_account AS a
+                result <- c('a.id', input$field, 'a.regist_time AS \'注册时间\'') %>%
+                  paste(collapse = ',') %>% 
+                  paste('select', ., 'FROM yz_sys_db.ps_account AS a
 LEFT JOIN yz_app_person_db.ps_attribute_variety AS b ON a.id = b.account_id
-                          AND a.del_status = 0
                           AND b.del_status = 0
                           LEFT JOIN
                           (SELECT account_id,
@@ -84,15 +91,27 @@ LEFT JOIN yz_app_person_db.ps_attribute_variety AS b ON a.id = b.account_id
                           ORDER BY status_time DESC) AS ps_vitae_main_temp
                           GROUP BY account_id) AS c ON a.id = c.account_id
                           WHERE a.id >= 20000
+			  and a.del_status = 0
+			  and a.username not like \'913%\'
                           AND b.full_name IS NOT NULL 
                           AND a.regist_time BETWEEN',
-                          sprintf('\'%s\'', input$date[1]), 
-                          'AND DATE_ADD(', 
-                          sprintf('\'%s\'', input$date[2]), 
-                          ', INTERVAL 1 DAY) GROUP BY a.id;', 
-                          sep = ' '
-                          ) %>% 
-                    dataGet()
+                        sprintf('\'%s\'', input$date[1]), 
+                        'AND DATE_ADD(', 
+                        sprintf('\'%s\'', input$date[2]), 
+                        ', INTERVAL 1 DAY) GROUP BY a.id;', 
+                        sep = ' '
+                  ) %>% 
+                  dataGet()
+                
+                if (input$phone_field) {
+                  tryCatch({
+                    result$field <- floor(as.numeric(result$`手机号`)/10000)
+                    result <- left_join(result, mobile_info, 'field') %>% 
+                      select(-field)
+                  }, error = function(e)e)
+                }
+                
+                return(result)
             })
             
             output$nrow <- renderText({

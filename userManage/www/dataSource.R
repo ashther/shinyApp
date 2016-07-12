@@ -23,3 +23,17 @@ dataGet <- function(sql) {
     
     return(result)
 }
+
+con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306, 
+                 username = 'r', password = '123456', 
+                 dbname = 'shiny_data')
+
+res <- dbSendQuery(con, 'SELECT field, province as 省份, city as 城市 FROM shiny_data.mobile_info;')
+mobile_info <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+  dbNextResult(con)
+}
+dbClearResult(res)
+dbDisconnect(con)
+rm(con, res)
+

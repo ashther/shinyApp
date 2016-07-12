@@ -15,6 +15,7 @@ shinyUI(bootstrapPage(
         column(width = 1), 
         column(width = 3, 
                uiOutput('field_ui'), 
+               uiOutput('phone_field_ui'), 
                uiOutput('date_ui'), 
                uiOutput('button_ui')
                ), 

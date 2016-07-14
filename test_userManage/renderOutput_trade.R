@@ -97,3 +97,30 @@ output$trade_price <- renderPlotly({
 #                                      'sell_price' = 'sell price',
 #                                      'buy_price' = 'purchase price')))
 # })
+# 
+
+
+# 自贸区地图输出
+output$user_location <- renderLeaflet({
+  
+  user_location_temp <- map_data() %>% 
+    mutate(longitude = round(as.numeric(longitude), 2),
+           latitude = round(as.numeric(latitude), 2)) %>%
+    group_by(longitude, latitude) %>%
+    summarise(n = n()) %>%
+    ungroup() %>%
+    arrange(desc(n)) %>%
+    as.data.frame()
+  
+  user_location_temp %>% 
+    leaflet() %>% 
+    addTiles(urlTemplate = 'http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png') %>% 
+    addCircleMarkers(lng = user_location_temp$longitude,
+                     lat = user_location_temp$latitude, 
+                     radius = user_location_temp$n, 
+                     fillOpacity = 0.4,  #when user scale get larger use stroke = FALSE & fillOpacity = 0.35
+                     popup = as.character(user_location_temp$n)) %>% 
+    setView(lng = mean(city_location$lng[city_location$city == input$city]),
+            lat = mean(city_location$lat[city_location$city == input$city]),
+            zoom = 12)
+})

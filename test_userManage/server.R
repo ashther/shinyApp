@@ -14,28 +14,12 @@ shinyServer(function(input, output, session) {
   # 载入数据框转时间序列过程
   source('dataToXts.R', encoding = 'utf-8', local = TRUE)
   
-  # 当省份选择变动时，更新对应的城市选项
-  observe({
-    city_update <- city_with_quote[city_location$province == input$province]
-    
-    updateSelectInput(session, 
-              'city', 
-              choices = city_update %>%
-                paste0(., '=', .) %>%
-                paste(collapse = ',') %>%
-                sprintf('list(%s)', .) %>%
-                parse(text = .) %>%
-                eval())
-  })
-  
   # 用户登录后渲染首页UI
   observe({
     if (login_check$logged == TRUE) {
       source('renderUI_login.R', encoding = 'utf-8', local = TRUE)
     }
   })
-  
-
   
   # 登录数据筛选
   login_data <- reactive({
@@ -48,11 +32,6 @@ shinyServer(function(input, output, session) {
       sprintf('cbind(%s)', .) %>%
       parse(text = .) %>%
       eval()
-  })
-  
-  map_data <- reactive({
-    subset(user_location, create_time >= input$map_date_range[1] & 
-                create_time <= input$map_date_range[2])
   })
   
   # 用户登陆后渲染首页输出图表
@@ -151,6 +130,54 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  # geo======================================================================
+  
+  app_start_dateRange_data <- reactive({
+    app_start[
+      app_start$time_stamp >= input$app_start_date_range[1] & 
+        app_start$time_stamp <= input$app_start_date_range[2], 
+      ]
+  })
+  
+  app_start_data <- reactive({
+    switch(
+      input$app_start_userType, 
+      'all' = app_start_dateRange_data(), 
+      'new' = subset(app_start_dateRange_data(), 
+                     regist_time >= input$app_start_date_range[1] &
+                       regist_time <= input$app_start_date_range[2]), 
+      'old' = subset(app_start_dateRange_data(), 
+                     regist_time < input$app_start_date_range[1])
+    )
+  })
+  
+  app_start_top10 <- reactive({
+    result <- sapply(1:nrow(app_start_data()), function(x) {
+      city_location$city[
+        which.min(
+          sqrt(
+            (app_start_data()$lon[x] - city_location$lng) ^ 2 + 
+              (app_start_data()$lat[x] - city_location$lat) ^ 2
+          )
+        )
+      ]
+    }) %>% 
+      table() %>% 
+      sort(decreasing = TRUE)
+    result <- result[1:ifelse(10 <= length(result), 10, length(result))]
+    return(data.frame('地区' = names(result), 
+                      '登录次数' = unname(result), 
+                      stringsAsFactors = FALSE, 
+                      row.names = NULL))
+  })
+  
+  # 渲染地图模块输出图表
+  observe({
+    if (login_check$logged == TRUE) {
+      source('renderOutput_geo.R', encoding = 'utf-8', local = TRUE)
+    }
+  })
+  
   # quick_chat===============================================================
   quick_chat_data <- reactive({
     get(paste(input$quick_chat_date_format, 'quick_chat', input$quick_chat_data_type, sep = '_'))
@@ -219,6 +246,26 @@ shinyServer(function(input, output, session) {
   
   
   # trade ===============================================================
+  
+  # 当省份选择变动时，更新对应的城市选项
+  observe({
+    city_update <- city_with_quote[city_location$province == input$province]
+    
+    updateSelectInput(session, 
+                      'city', 
+                      choices = city_update %>%
+                        paste0(., '=', .) %>%
+                        paste(collapse = ',') %>%
+                        sprintf('list(%s)', .) %>%
+                        parse(text = .) %>%
+                        eval())
+  })
+  
+  map_data <- reactive({
+    subset(user_location, create_time >= input$map_date_range[1] & 
+             create_time <= input$map_date_range[2])
+  })
+  
   trade_data <- reactive({
     get(paste(input$trade_date_format, 'trade', input$trade_data_type, sep = '_'))
   })

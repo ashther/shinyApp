@@ -36,6 +36,7 @@ output$active_user_today <- renderValueBox({
              '当日活跃用户数', 
              icon('user'))
 })
+
 # 当日登陆次数
 output$login_times_today <- renderValueBox({
     valueBox(point_data$value[point_data$item == 'login_times'], 
@@ -72,27 +73,3 @@ output$login_plot_2 <- renderDygraph({
         dyRangeSelector(dateWindow = input$login_date_range_freq)
 })
 
-# 地图输出
-output$user_location <- renderLeaflet({
-    
-    user_location_temp <- map_data() %>% 
-        mutate(longitude = round(as.numeric(longitude), 2),
-               latitude = round(as.numeric(latitude), 2)) %>%
-        group_by(longitude, latitude) %>%
-        summarise(n = n()) %>%
-        ungroup() %>%
-        arrange(desc(n)) %>%
-        as.data.frame()
-    
-    user_location_temp %>% 
-        leaflet() %>% 
-        addTiles(urlTemplate = 'http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png') %>% 
-        addCircleMarkers(lng = user_location_temp$longitude,
-                         lat = user_location_temp$latitude, 
-                         radius = user_location_temp$n, 
-                         fillOpacity = 0.4,  #when user scale get larger use stroke = FALSE & fillOpacity = 0.35
-                         popup = as.character(user_location_temp$n)) %>% 
-        setView(lng = mean(city_location$lng[city_location$city == input$city]),
-                lat = mean(city_location$lat[city_location$city == input$city]),
-                zoom = 12)
-})

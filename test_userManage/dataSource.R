@@ -143,6 +143,24 @@ while (dbMoreResults(con)) {
 }
 dbClearResult(res)
 
+res <- dbSendQuery(con, paste0("SELECT a.id, 
+                               a.user_id, 
+                               a.lon, 
+                               a.lat, 
+                               a.time_stamp, 
+                               b.regist_time 
+                               FROM   yz_app_track_db.app_start AS a 
+                               INNER JOIN yz_sys_db.ps_account AS b 
+                               ON a.user_id = b.id 
+                               WHERE  a.del_status = 0 
+                               AND b.del_status = 0 
+                               AND a.user_id >= 20000;"))
+app_start <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+  dbNextResult(con)
+}
+dbClearResult(res)
+
 demographic_test_string <- paste0("SELECT a.id, ", 
                                   "b.sex                              AS gender, ", 
                                   "b.highest_education                AS degree, ", 
@@ -663,6 +681,10 @@ rm(dt, hr, wk, mt)
 #==============================================================================
 user_location <- na.omit(user_location)
 user_location$create_time <- as.Date(user_location$create_time)
+
+app_start$time_stamp <- as.Date(app_start$time_stamp)
+app_start$regist_time <- as.Date(app_start$regist_time)
+app_start[, 2:4] <- sapply(app_start[, 2:4], as.numeric)
 
 # =============================================================================
 sell_price$price <- as.numeric(sell_price$price)

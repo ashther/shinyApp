@@ -1,8 +1,8 @@
 
 output$login_date_format_render <- renderUI({
-    selectInput('login_date_format',
+    selectInput(inputId = 'login_date_format',
                 label = '选择统计周期',
-                choices = list(# '小时' = 'hourly',
+                choices = list(
                     '日' = 'daily',
                     '周' = 'weekly',
                     '月' = 'monthly'),
@@ -64,3 +64,25 @@ output$login_freq_type_render <- renderUI({
                                       '1-2次' = '1'),
                        selected = '1')
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

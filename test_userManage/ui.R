@@ -23,6 +23,9 @@ shinyUI(dashboardPage(
       menuItem('用户属性统计', 
            tabName = 'demographic', 
            icon = icon('bar-chart')),
+      menuItem('用户登录定位统计', 
+               tabName = 'geo', 
+               icon = icon('map-marker')), 
       menuItem('快信', 
            tabName = 'quick_chat', 
            icon = icon('weixin')), 
@@ -110,19 +113,19 @@ shinyUI(dashboardPage(
           )
         ), 
         
-        br(),
-        br(),
+        br(), 
+        br(), 
         
-        #第三行，日登陆频次统计
+        #第四行，日登陆频次统计
         fluidRow(
           
-          # 第三行第一列，日登陆频次图
+          # 第四行第一列，日登陆频次图
           column(
             width = 8, 
             dygraphOutput('login_plot_2')
           ), 
           
-          # 第三行第二列，日登陆频次绘图选项
+          # 第四行第二列，日登陆频次绘图选项
           column(
             width = 4, 
             
@@ -134,6 +137,68 @@ shinyUI(dashboardPage(
             
             # 绘图多选选项
             uiOutput('login_freq_type_render')
+          )
+        )
+      ),
+      
+      tabItem(
+        tabName = 'geo', 
+        
+        column(
+          width = 9, 
+          box(
+            title = '用户登录定位统计', 
+            leafletOutput('app_start', 
+                          height = 700), 
+            width = NULL, 
+            height = 800,
+            solidHeader = TRUE
+          )
+        ), 
+        
+        column(
+          width = 3, 
+          box(
+            tags$div(title = 'app_start_city'), 
+            selectizeInput('app_start_city', 
+                           '选择城市', 
+                           choices = city_location$city, 
+                           selected = '西安市'), 
+            width = NULL, 
+            solidHeader = TRUE
+          ), 
+          
+          box(
+            tags$div(title = 'app_start_userType'), 
+            selectInput('app_start_userType',
+                        '用户类型',
+                        choices = list(
+                          '全体用户' = 'all', 
+                          '新增用户' = 'new', 
+                          '存量用户' = 'old'
+                        ), 
+                           selected = 'all'), 
+            width = NULL, 
+            solidHeader = TRUE
+          ), 
+          
+          box(
+            tags$div(title = 'app_start_date_range'), 
+            dateRangeInput('app_start_date_range', 
+                           label = '选择统计区间', 
+                           min = min(app_start$time_stamp), 
+                           max = max(app_start$time_stamp), 
+                           start = max(app_start$time_stamp), 
+                           language = 'zh-CN'), 
+            width = NULL, 
+            solidHeader = TRUE
+          ), 
+          
+          box(
+            tags$div(title = 'app_start_top10'), 
+            tableOutput('app_start_top10'), 
+            width = NULL, 
+            solidHeader = TRUE
           )
         )
       ),

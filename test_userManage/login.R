@@ -4,15 +4,15 @@ output$uiLogin <- renderUI({
             textInput('user_name', '用户名：'),
             passwordInput('passwd', '密码：'),
             br(),
-            actionButton('login', '登录')
+            actionButton('login_button', '登录')
         )
     }
 })
 
 output$pass <- renderText({
     if (login_check$logged == FALSE) {
-        if (!is.null(input$login)) {
-            if (input$login > 0) {
+        if (!is.null(input$login_button)) {
+            if (input$login_button > 0) {
                 if (nrow(user_passwd[
                     user_passwd$user == input$user_name &
                     user_passwd$passwd == input$passwd,

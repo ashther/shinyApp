@@ -56,12 +56,12 @@ output$login_date_range_freq_render <- renderUI({
 output$login_freq_type_render <- renderUI({
     checkboxGroupInput('login_freq_type',
                        label = '选择频次区间',
-                       choices = list('大于等于50次' = '50',
-                                      '20-49次' = '20',
-                                      '10-19次' = '10',
-                                      '6-9次' = '6',
-                                      '3-5次' = '3',
-                                      '1-2次' = '1'),
+                       choices = list('大于5次' = '5p',
+                                      '5次' = '5',
+                                      '4次' = '4',
+                                      '3次' = '3',
+                                      '2次' = '2',
+                                      '1次' = '1'),
                        selected = '1')
 })
 

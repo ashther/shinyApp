@@ -682,6 +682,7 @@ rm(dt, hr, wk, mt)
 user_location <- na.omit(user_location)
 user_location$create_time <- as.Date(user_location$create_time)
 
+app_start$timestamp <- app_start$time_stamp
 app_start$time_stamp <- as.Date(app_start$time_stamp)
 app_start$regist_time <- as.Date(app_start$regist_time)
 app_start[, 2:4] <- sapply(app_start[, 2:4], as.numeric)

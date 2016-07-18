@@ -15,18 +15,18 @@ names(daily_log_in) <- 'login'
 daily_retention <- xts(daily_login$retention, order.by = daily_login$date_time)
 names(daily_retention) <- 'retention'
 
-daily_freq_50 <- xts(daily_login$freq_50, order.by = daily_login$date_time)
-names(daily_freq_50) <- '50+'
-daily_freq_20 <- xts(daily_login$freq_20, order.by = daily_login$date_time)
-names(daily_freq_20) <- '20-49'
-daily_freq_10 <- xts(daily_login$freq_10, order.by = daily_login$date_time)
-names(daily_freq_10) <- '10-19'
-daily_freq_6 <- xts(daily_login$freq_6, order.by = daily_login$date_time)
-names(daily_freq_6) <- '6-9'
+daily_freq_5p <- xts(daily_login$freq_5p, order.by = daily_login$date_time)
+names(daily_freq_5p) <- '5+'
+daily_freq_5 <- xts(daily_login$freq_5, order.by = daily_login$date_time)
+names(daily_freq_5) <- '5'
+daily_freq_4 <- xts(daily_login$freq_4, order.by = daily_login$date_time)
+names(daily_freq_4) <- '4'
 daily_freq_3 <- xts(daily_login$freq_3, order.by = daily_login$date_time)
-names(daily_freq_3) <- '3-5'
+names(daily_freq_3) <- '3'
+daily_freq_2 <- xts(daily_login$freq_2, order.by = daily_login$date_time)
+names(daily_freq_2) <- '2'
 daily_freq_1 <- xts(daily_login$freq_1, order.by = daily_login$date_time)
-names(daily_freq_1) <- '1-2'
+names(daily_freq_1) <- '1'
 
 weekly_new <- xts(weekly_login$new, order.by = weekly_login$date_time)
 names(weekly_new) <- 'new'

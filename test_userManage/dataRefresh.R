@@ -15,7 +15,8 @@ hourly_quick_chat <- hourlyDataRefresh(Sys.time(), hourly_quick_chat, con)
 hourly_schedule <- hourlyDataRefresh(Sys.time(), hourly_schedule, con)
 hourly_trade <- hourlyDataRefresh(Sys.time(), hourly_trade, con)
 hourly_train <- hourlyDataRefresh(Sys.time(), hourly_train, con)
-
+# 刷新app_start
+app_start <- appStartRefresh(Sys.time(), app_start, con)
 
 dbDisconnect(con)
 rm(con)

@@ -21,35 +21,42 @@ pointRefresh <- function(now, point_data, con) {
     return(point_data)
 }
 
-# hourlyRefresh <- function(now, hourly_login, con) {
-#     if (difftime(now, max(hourly_login$date_time), units = 'hours') < 1.1) {
-#         return(hourly_login)
-#     }
-#     
-#     hourly_login_new <- dbSendQuery(
-#         con, 
-#         paste0(
-#             'select * from hourly.login where date_time > ', 
-#             sprintf('\'%s\'', format(max(hourly_login$date_time), '%Y-%m-%d-%H')), 
-#             ';'
-#         )
-#     ) %>% 
-#         dbFetch(n = -1)
-#     
-#     hourly_login_new$date_time <- strptime(hourly_login_new$date_time,
-#                                            format = '%Y-%m-%d-%H') %>% as.POSIXct()
-#     temp_hr <- as.POSIXlt(now)
-#     temp_hr$hour <- temp_hr$hour - 1
-#     hr <- data.frame(date_time = seq(from = max(hourly_login$date_time), 
-#                                      to = as.POSIXct(format(temp_hr, '%Y-%m-%d %H:00:00')), 
-#                                      by = 'hour'))
-#     
-#     hourly_login_new <- left_join(hr, hourly_login_new, by = 'date_time') %>% 
-#         select(date_time, new, active, login)
-#     hourly_login_new[is.na(hourly_login_new)] <- 0
-#     
-#     return(rbind(hourly_login, hourly_login_new[-1, ]))
-# }
+appStartRefresh <- function(now, app_start, con) {
+  if (difftime(now, max(app_start$timestamp), units = 'hours') < 1) {
+    return(app_start)
+  }
+  
+  temp <- dbSendQuery(
+    con, 
+    paste0(
+      "SELECT a.id, 
+       a.user_id, 
+       a.lon, 
+       a.lat, 
+       a.time_stamp, 
+       b.regist_time 
+       FROM   yz_app_track_db.app_start AS a 
+       INNER JOIN yz_sys_db.ps_account AS b 
+               ON a.user_id = b.id 
+       WHERE  a.del_status = 0 
+       AND b.del_status = 0 
+       AND a.user_id >= 20000
+       AND a.time_stamp > ", 
+       sprintf("'%s'", max(app_start$timestamp)), 
+      ";"
+    )
+  ) %>% 
+    dbFetch(n = -1)
+  
+  temp$timestamp <- temp$time_stamp
+  temp$time_stamp <- as.Date(temp$time_stamp)
+  temp$regist_time <- as.Date(temp$regist_time)
+  temp[, 2:4] <- sapply(temp[, 2:4], as.numeric)
+  
+  app_start <- rbind(app_start, temp)
+  
+  return(app_start)
+}
 
 hourlyDataRefresh <- function(now, hourly_data, con) {
     if (difftime(now, max(hourly_data$date_time), units = 'hours') < 1.1) {

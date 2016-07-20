@@ -204,7 +204,9 @@ shinyUI(dashboardPage(
           p(helpText('对登录次数前10的地区统计仅供参考，
                      当用户位于相邻城市如西安与咸阳交界处时，
                      用户可能基于距离而非行政区域被划分至不同城市。'), 
-            style = 'font-size:85%')
+            style = 'font-size:85%'), 
+          
+          uiOutput('specific_user_geo_ui')
         )
       ),
       

@@ -140,15 +140,38 @@ shinyServer(function(input, output, session) {
   })
   
   app_start_data <- reactive({
-    switch(
-      input$app_start_userType, 
-      'all' = app_start_dateRange_data(), 
-      'new' = subset(app_start_dateRange_data(), 
-                     regist_time >= input$app_start_date_range[1] &
-                       regist_time <= input$app_start_date_range[2]), 
-      'old' = subset(app_start_dateRange_data(), 
-                     regist_time < input$app_start_date_range[1])
-    )
+    if (input$user_name == 'sunlj') {
+      if (input$specific_user_geo != 'noSpecific') {
+        return(
+          subset(app_start_dateRange_data(),
+                 user_id == input$specific_user_geo)
+        )
+      } else {
+        return(
+          switch(
+            input$app_start_userType,
+            'all' = app_start_dateRange_data(),
+            'new' = subset(app_start_dateRange_data(),
+                           regist_time >= input$app_start_date_range[1] &
+                             regist_time <= input$app_start_date_range[2]),
+            'old' = subset(app_start_dateRange_data(),
+                           regist_time < input$app_start_date_range[1])
+          )
+        )
+      }
+    } else {
+      return(
+        switch(
+          input$app_start_userType,
+          'all' = app_start_dateRange_data(),
+          'new' = subset(app_start_dateRange_data(),
+                         regist_time >= input$app_start_date_range[1] &
+                           regist_time <= input$app_start_date_range[2]),
+          'old' = subset(app_start_dateRange_data(),
+                         regist_time < input$app_start_date_range[1])
+        )
+      )
+    }
   })
   
   app_start_top10 <- reactive({
@@ -164,11 +187,15 @@ shinyServer(function(input, output, session) {
     }) %>% 
       table() %>% 
       sort(decreasing = TRUE)
-    result <- result[1:ifelse(10 <= length(result), 10, length(result))]
-    return(data.frame('地区' = names(result), 
-                      '登录次数' = unname(result), 
-                      stringsAsFactors = FALSE, 
-                      row.names = NULL))
+    if (length(result) > 0) {
+      result <- result[1:ifelse(10 <= length(result), 10, length(result))]
+      return(data.frame('地区' = names(result), 
+                        '登录次数' = unname(result), 
+                        stringsAsFactors = FALSE, 
+                        row.names = NULL))
+    } else {
+      return(NULL)
+    }
   })
   
   # 渲染地图模块输出图表

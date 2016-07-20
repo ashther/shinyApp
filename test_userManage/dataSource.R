@@ -31,8 +31,8 @@ appStartRefresh <- function(now, app_start, con) {
     paste0(
       "SELECT a.id, 
        a.user_id, 
-       a.lon, 
-       a.lat, 
+       (a.lon - 0.011) as lon, 
+       (a.lat - 0.004) as lat,  
        a.time_stamp, 
        b.regist_time 
        FROM   yz_app_track_db.app_start AS a 
@@ -152,8 +152,8 @@ dbClearResult(res)
 
 res <- dbSendQuery(con, paste0("SELECT a.id, 
                                a.user_id, 
-                               a.lon, 
-                               a.lat, 
+                               (a.lon - 0.011) as lon, 
+                               (a.lat - 0.004) as lat, 
                                a.time_stamp, 
                                b.regist_time 
                                FROM   yz_app_track_db.app_start AS a 

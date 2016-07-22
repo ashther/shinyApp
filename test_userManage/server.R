@@ -21,6 +21,12 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  observe({
+    if (login_check$logged == TRUE) {
+      source('shinyServerLog.R', encoding = 'utf-8', local = TRUE)
+    }
+  })
+  
   # 登录数据筛选
   login_data <- reactive({
     get(paste(input$login_date_format, input$login_data_type, sep = '_'))

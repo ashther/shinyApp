@@ -20,3 +20,4 @@ app_start <- appStartRefresh(Sys.time(), app_start, con)
 
 dbDisconnect(con)
 rm(con)
+

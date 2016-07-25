@@ -102,7 +102,7 @@ province_with_quote <- paste0('\'', unique(city_location$province), '\'')
 con <- dbConnect(MySQL(), host = host, port = port, 
                  username = username, password = password, 
                  dbname = dbname)
-dbSendQuery(con, 'set names gbk')
+# dbSendQuery(con, 'set names gbk')
 
 res <- dbSendQuery(con, 'select * from stat.point_data;')
 point_data <- dbFetch(res, n = -1)
@@ -151,17 +151,32 @@ while (dbMoreResults(con)) {
 dbClearResult(res)
 
 res <- dbSendQuery(con, paste0("SELECT a.id, 
-                               a.user_id, 
-                               (a.lon - 0.011) as lon, 
-                               (a.lat - 0.004) as lat, 
-                               a.time_stamp, 
-                               b.regist_time 
-                               FROM   yz_app_track_db.app_start AS a 
-                               INNER JOIN yz_sys_db.ps_account AS b 
-                               ON a.user_id = b.id 
-                               WHERE  a.del_status = 0 
-                               AND b.del_status = 0 
-                               AND a.user_id >= 20000;"))
+       a.user_id, 
+       Ifnull(a.app_version_code, '缺失') AS version, 
+       Ifnull(( CASE a.app_channel_id 
+                  WHEN 'A001' THEN '360' 
+                  WHEN 'A002' THEN '百度' 
+                  WHEN 'A003' THEN '腾讯' 
+                  WHEN 'A004' THEN '豌豆荚' 
+                  WHEN 'A005' THEN '小米' 
+                  WHEN 'A006' THEN 'oppo' 
+                  WHEN 'A007' THEN '魅族' 
+                  WHEN 'A008' THEN '华为' 
+                  WHEN 'A009' 
+                        OR 'B%' THEN '其他' 
+                  WHEN 'appstore' THEN '苹果' 
+                  ELSE a.app_channel_id 
+                END ), '缺失')            AS channel, 
+       ( a.lon - 0.011 )                    AS lon, 
+       ( a.lat - 0.004 )                    AS lat, 
+       a.time_stamp, 
+       b.regist_time 
+FROM   yz_app_track_db.app_start AS a 
+       INNER JOIN yz_sys_db.ps_account AS b 
+               ON a.user_id = b.id 
+WHERE  a.del_status = 0 
+       AND b.del_status = 0 
+       AND a.user_id >= 20000;"))
 app_start <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
   dbNextResult(con)
@@ -692,7 +707,9 @@ user_location$create_time <- as.Date(user_location$create_time)
 app_start$timestamp <- app_start$time_stamp
 app_start$time_stamp <- as.Date(app_start$time_stamp)
 app_start$regist_time <- as.Date(app_start$regist_time)
-app_start[, 2:4] <- sapply(app_start[, 2:4], as.numeric)
+app_start$user_id <- as.integer(app_start$user_id)
+app_start$lon <- as.numeric(app_start$lon)
+app_start$lat <- as.numeric(app_start$lat)
 
 # =============================================================================
 sell_price$price <- as.numeric(sell_price$price)

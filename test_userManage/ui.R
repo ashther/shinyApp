@@ -23,6 +23,9 @@ shinyUI(dashboardPage(
       menuItem('用户属性统计', 
            tabName = 'demographic', 
            icon = icon('bar-chart')),
+      menuItem('渠道来源及应用版本', 
+               tabName = 'channel', 
+               icon = icon('cloud-download')), 
       menuItem('用户登录定位统计', 
                tabName = 'geo', 
                icon = icon('map-marker')), 
@@ -307,6 +310,87 @@ shinyUI(dashboardPage(
                p(helpText('选项对图4有效'), 
                  style = 'font-size:85%')) # 注册日期选择
         )
+      ), 
+      
+      # 渠道来源及应用版本号
+      tabItem(
+        tabName = 'channel', 
+        
+          fluidRow(
+            
+            #　第一列
+            column(
+              width = 9, 
+              fluidRow(
+                # 第一列中的第一行第一列，渠道来源
+                column(
+                  width = 6, 
+                  box(plotlyOutput('channel'), 
+                      width = NULL, 
+                      solidHeader = TRUE)
+                ), 
+                
+                # 第一列中第一行第二列，版本
+                column(
+                  width = 6, 
+                  box(plotlyOutput('versionCode'), 
+                      width = NULL, 
+                      solidHeader = TRUE)
+                )
+              ), 
+              
+              # 第一列中的第二行，渠道版本热图
+              fluidRow(
+                box(plotlyOutput('channel_version_heatmap'), 
+                    width = NULL, 
+                    solidHeader = TRUE)
+              )
+            ), 
+            
+            # 第二列，参数
+            column(
+              width = 3, 
+              box(checkboxInput('channel_null', 
+                                '去除无渠道来源的用户', 
+                                value = TRUE), 
+                  width = NULL, 
+                  solidHeader = TRUE, 
+                  background = 'red'), 
+              
+              box(checkboxInput('channel_other', 
+                                '去除其他渠道来源的用户', 
+                                value = FALSE), 
+                  width = NULL, 
+                  solidHeader = TRUE, 
+                  background = 'red'), 
+              
+              box(
+                tags$div(title = 'channel_userType'), 
+                selectInput('channel_userType',
+                            '用户类型',
+                            choices = list(
+                              '全体用户' = 'all', 
+                              '存量用户' = 'old', 
+                              '新增用户' = 'new'
+                            ), 
+                            selected = 'all'), 
+                width = NULL, 
+                solidHeader = TRUE
+              ), 
+              
+              box(
+                tags$div(title = 'channel_date_range'), 
+                dateRangeInput('channel_date_range', 
+                               label = '选择统计区间', 
+                               min = min(app_start$time_stamp), 
+                               max = max(app_start$time_stamp), 
+                               start = max(app_start$time_stamp), 
+                               language = 'zh-CN'), 
+                width = NULL, 
+                solidHeader = TRUE
+              )
+            )
+          )
       ), 
       
       tabItem(

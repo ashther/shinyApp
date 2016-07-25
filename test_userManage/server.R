@@ -21,6 +21,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  # 登录日志入库
   observe({
     if (login_check$logged == TRUE) {
       source('shinyServerLog.R', encoding = 'utf-8', local = TRUE)
@@ -208,6 +209,49 @@ shinyServer(function(input, output, session) {
   observe({
     if (login_check$logged == TRUE) {
       source('renderOutput_geo.R', encoding = 'utf-8', local = TRUE)
+    }
+  })
+  
+  # channel==================================================================
+  
+  channel_dateRange_data <- reactive({
+    app_start[
+      app_start$time_stamp >= input$channel_date_range[1] & 
+        app_start$time_stamp <= input$channel_date_range[2], 
+      ]
+  })
+  
+  channel_data <- reactive({
+    result <- switch(
+      input$channel_userType,
+      'all' = channel_dateRange_data(),
+      'new' = subset(channel_dateRange_data(),
+                     regist_time >= input$channel_date_range[1] &
+                       regist_time <= input$channel_date_range[2]),
+      'old' = subset(channel_dateRange_data(),
+                     regist_time < input$channel_date_range[1])
+    )
+    
+    if (input$channel_null) {
+      result <- filter(result, version != '缺失' & channel != '缺失')
+    }
+    
+    result <- result %>% 
+      group_by(user_id) %>%
+      arrange(desc(timestamp)) %>% 
+      top_n(1, timestamp) %>% 
+      ungroup()
+    
+    if (input$channel_other) {
+      result <- filter(result, channel != '其他')
+    }
+    
+    return(result)
+  })
+  
+  observe({
+    if (login_check$logged == TRUE) {
+      source('renderOutput_channel.R', encoding = 'utf-8', local = TRUE)
     }
   })
   

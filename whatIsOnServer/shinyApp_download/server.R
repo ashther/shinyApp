@@ -1,8 +1,8 @@
 
 source('www/dataSource.R', local = TRUE)
-user_passwd <- data.frame(user = c('sunlj', 'zhoumn', 'zhangp', 'chenmq'), 
-                          passwd = c('sunlj', 'zhoumn', 'zhangp', 'chenmq'), 
-                          stringsAsFactors = FALSE)
+# user_passwd <- data.frame(user = c('sunlj', 'zhoumn', 'zhangp', 'chenmq'), 
+#                           passwd = c('sunlj', 'zhoumn', 'zhangp', 'chenmq'), 
+#                           stringsAsFactors = FALSE)
 logged <- FALSE
 
 shinyServer(function(input, output, session) {

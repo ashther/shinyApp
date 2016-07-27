@@ -9,7 +9,9 @@ library(plotly)
 shinyUI(dashboardPage(
     skin = 'black', 
     
-    dashboardHeader(title = '数据分析'), 
+    dashboardHeader(
+    	title = '数据分析'
+    	), 
     
     dashboardSidebar(
         

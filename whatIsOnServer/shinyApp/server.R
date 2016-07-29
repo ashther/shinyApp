@@ -15,15 +15,10 @@ shinyServer(function(input, output, session) {
   source('dataToXts.R', encoding = 'utf-8', local = TRUE)
   
   # 用户登录后渲染首页UI
-  observe({
-    if (login_check$logged == TRUE) {
-      source('renderUI_login.R', encoding = 'utf-8', local = TRUE)
-    }
-  })
-  
   # 登录日志入库
   observe({
     if (login_check$logged == TRUE) {
+      source('renderUI_login.R', encoding = 'utf-8', local = TRUE)
       source('shinyServerLog.R', encoding = 'utf-8', local = TRUE)
     }
   })

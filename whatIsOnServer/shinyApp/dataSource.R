@@ -94,10 +94,10 @@ hourlyDataRefresh <- function(now, hourly_data, con) {
 
 
 
-city_location <- read.csv('city_location.csv', stringsAsFactors = FALSE, 
-                          row.names = NULL, fileEncoding = 'utf-8')
-city_with_quote <- paste0('\'', city_location$city, '\'')
-province_with_quote <- paste0('\'', unique(city_location$province), '\'')
+# city_location <- read.csv('city_location.csv', stringsAsFactors = FALSE, 
+#                           row.names = NULL, fileEncoding = 'utf-8')
+# city_with_quote <- paste0('\'', city_location$city, '\'')
+# province_with_quote <- paste0('\'', unique(city_location$province), '\'')
 
 con <- dbConnect(MySQL(), host = host, port = port, 
                  username = username, password = password, 
@@ -107,6 +107,16 @@ con <- dbConnect(MySQL(), host = host, port = port,
 res <- dbSendQuery(con, 'select username as user, password as passwd 
                    from shiny_data.shiny_user;')
 user_passwd <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+  dbNextResult(con)
+}
+dbClearResult(res)
+
+res <- dbSendQuery(con, "select province, city, lng, lat 
+                   from shiny_data.cityInfo
+                   where country in ('China', 'Canada')
+                   or iso3 = 'USA';")
+city_location <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
   dbNextResult(con)
 }
@@ -147,16 +157,16 @@ while (dbMoreResults(con)) {
 }
 dbClearResult(res)
 
-res <- dbSendQuery(con, paste0('SELECT create_time, longitude, latitude ', 
-                               'FROM yz_app_trade_db.sell_commodity ', 
-                               'WHERE del_status = 0 ', 
-                               'AND account_id >= 20000 ', 
-                               'AND commodity_status = 1;'))
-user_location <- dbFetch(res, n = -1)
-while (dbMoreResults(con)) {
-    dbNextResult(con)
-}
-dbClearResult(res)
+# res <- dbSendQuery(con, paste0('SELECT create_time, longitude, latitude ', 
+#                                'FROM yz_app_trade_db.sell_commodity ', 
+#                                'WHERE del_status = 0 ', 
+#                                'AND account_id >= 20000 ', 
+#                                'AND commodity_status = 1;'))
+# user_location <- dbFetch(res, n = -1)
+# while (dbMoreResults(con)) {
+#     dbNextResult(con)
+# }
+# dbClearResult(res)
 
 res <- dbSendQuery(con, paste0("SELECT a.id, 
        a.user_id, 
@@ -299,8 +309,8 @@ monthly_login[is.na(monthly_login)] <- 0
 
 rm(dt, hr, wk, mt)
 #==============================================================================
-user_location <- na.omit(user_location)
-user_location$create_time <- as.Date(user_location$create_time)
+# user_location <- na.omit(user_location)
+# user_location$create_time <- as.Date(user_location$create_time)
 
 app_start$timestamp <- app_start$time_stamp
 app_start$time_stamp <- as.Date(app_start$time_stamp)
@@ -308,8 +318,6 @@ app_start$regist_time <- as.Date(app_start$regist_time)
 app_start$user_id <- as.integer(app_start$user_id)
 app_start$lon <- as.numeric(app_start$lon)
 app_start$lat <- as.numeric(app_start$lat)
-
-
 
 
 

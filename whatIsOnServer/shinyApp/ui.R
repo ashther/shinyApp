@@ -5,6 +5,7 @@ library(xts)
 library(leaflet)
 library(ggplot2)
 library(plotly)
+library(digest)
 
 source('dataSource.R')
 

@@ -31,14 +31,29 @@ appStartRefresh <- function(now, app_start, con) {
     paste0(
       "SELECT a.id, 
        a.user_id, 
-       (a.lon - 0.011) as lon, 
-       (a.lat - 0.004) as lat,  
+       IFNULL(a.app_version_code, '缺失') AS version, 
+       IFNULL(( CASE a.app_channel_id 
+                  WHEN 'A001' THEN '360' 
+                  WHEN 'A002' THEN '百度' 
+                  WHEN 'A003' THEN '腾讯' 
+                  WHEN 'A004' THEN '豌豆荚' 
+                  WHEN 'A005' THEN '小米' 
+                  WHEN 'A006' THEN 'oppo' 
+                  WHEN 'A007' THEN '魅族' 
+                  WHEN 'A008' THEN '华为' 
+                  WHEN 'A009' 
+                        OR 'B%' THEN '其他' 
+                  WHEN 'appstore' THEN '苹果' 
+                  ELSE a.app_channel_id 
+                END ), '缺失')            AS channel, 
+       ( a.lon - 0.011 )                    AS lon, 
+       ( a.lat - 0.004 )                    AS lat, 
        a.time_stamp, 
        b.regist_time 
-       FROM   yz_app_track_db.app_start AS a 
+FROM   yz_app_track_db.app_start AS a 
        INNER JOIN yz_sys_db.ps_account AS b 
                ON a.user_id = b.id 
-       WHERE  a.del_status = 0 
+WHERE  a.del_status = 0 
        AND b.del_status = 0 
        AND a.user_id >= 20000
        AND a.time_stamp > ", 
@@ -51,7 +66,7 @@ appStartRefresh <- function(now, app_start, con) {
   temp$timestamp <- temp$time_stamp
   temp$time_stamp <- as.Date(temp$time_stamp)
   temp$regist_time <- as.Date(temp$regist_time)
-  temp[, 2:4] <- sapply(temp[, 2:4], as.numeric)
+  temp$user_id <- as.integer(temp$user_id)
   
   app_start <- rbind(app_start, temp)
   
@@ -316,8 +331,6 @@ app_start$timestamp <- app_start$time_stamp
 app_start$time_stamp <- as.Date(app_start$time_stamp)
 app_start$regist_time <- as.Date(app_start$regist_time)
 app_start$user_id <- as.integer(app_start$user_id)
-app_start$lon <- as.numeric(app_start$lon)
-app_start$lat <- as.numeric(app_start$lat)
 
 
 

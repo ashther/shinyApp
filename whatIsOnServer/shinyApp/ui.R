@@ -127,69 +127,71 @@ shinyUI(dashboardPage(
       tabItem(
         tabName = 'geo', 
         
-        column(
-          width = 9, 
-          box(
-            title = '用户登录定位统计', 
-            leafletOutput('app_start', 
-                          height = 700), 
-            width = NULL, 
-            height = 800,
-            solidHeader = TRUE
-          )
-        ), 
-        
-        column(
-          width = 3, 
-          box(
-            tags$div(title = 'app_start_city'), 
-            selectizeInput('app_start_city', 
-                           '选择城市', 
-                           choices = city_location$city, 
-                           selected = '西安市'), 
-            width = NULL, 
-            solidHeader = TRUE
+        fluidRow(
+          column(
+            width = 9, 
+            box(
+              title = '用户登录定位统计', 
+              leafletOutput('app_start', 
+                            height = 700), 
+              width = NULL, 
+              height = 800,
+              solidHeader = TRUE
+            )
           ), 
           
-          box(
-            tags$div(title = 'app_start_userType'), 
-            selectInput('app_start_userType',
-                        '用户类型',
-                        choices = list(
-                          '全体用户' = 'all', 
-                          '新增用户' = 'new', 
-                          '存量用户' = 'old'
-                        ), 
-                           selected = 'all'), 
-            width = NULL, 
-            solidHeader = TRUE
-          ), 
-          
-          box(
-            tags$div(title = 'app_start_date_range'), 
-            dateRangeInput('app_start_date_range', 
-                           label = '选择统计区间', 
-                           min = min(app_start$time_stamp), 
-                           max = max(app_start$time_stamp), 
-                           start = max(app_start$time_stamp), 
-                           language = 'zh-CN'), 
-            width = NULL, 
-            solidHeader = TRUE
-          ), 
-          
-          box(
-            tags$div(title = 'app_start_top10'), 
-            tableOutput('app_start_top10'), 
-            width = NULL, 
-            solidHeader = TRUE
-          ), 
-          
-          p(helpText('对登录次数前10的地区统计仅供参考，
+          column(
+            width = 3, 
+            box(
+              tags$div(title = 'app_start_city'), 
+              selectizeInput('app_start_city', 
+                             '选择城市', 
+                             choices = city_location$city, 
+                             selected = '西安市'), 
+              width = NULL, 
+              solidHeader = TRUE
+            ), 
+            
+            box(
+              tags$div(title = 'app_start_userType'), 
+              selectInput('app_start_userType',
+                          '用户类型',
+                          choices = list(
+                            '全体用户' = 'all', 
+                            '新增用户' = 'new', 
+                            '存量用户' = 'old'
+                          ), 
+                          selected = 'all'), 
+              width = NULL, 
+              solidHeader = TRUE
+            ), 
+            
+            box(
+              tags$div(title = 'app_start_date_range'), 
+              dateRangeInput('app_start_date_range', 
+                             label = '选择统计区间', 
+                             min = min(app_start$time_stamp), 
+                             max = max(app_start$time_stamp), 
+                             start = max(app_start$time_stamp), 
+                             language = 'zh-CN'), 
+              width = NULL, 
+              solidHeader = TRUE
+            ), 
+            
+            box(
+              tags$div(title = 'app_start_topArea'),
+              tableOutput('topArea'),
+              width = NULL,
+              solidHeader = TRUE
+            ),
+            
+            p(helpText('对登录次数前10的地区统计仅供参考，
                      当用户位于相邻城市如西安与咸阳交界处时，
                      用户可能基于距离而非行政区域被划分至不同城市。'), 
-            style = 'font-size:85%'), 
-          
-          uiOutput('specific_user_geo_ui')
+              style = 'font-size:85%'), 
+            
+            uiOutput('specific_user_geo_ui')
+          )
         )
       ),
       
@@ -198,9 +200,6 @@ shinyUI(dashboardPage(
         
         fluidRow(
           column(width = 9, 
-                 
-                 # # print_to_test
-                 # textOutput('test'),
                  
                fluidRow(# 删除异常确定、年龄bar图
                  box(tags$div(title = paste0('一组数据的上下四分位数之间的距离为IQR， ', 
@@ -297,76 +296,76 @@ shinyUI(dashboardPage(
         tabName = 'channel', 
         
           fluidRow(
-            
+
             #　第一列
             column(
-              width = 9, 
+              width = 9,
               fluidRow(
                 # 第一列中的第一行第一列，渠道来源
                 column(
-                  width = 6, 
-                  box(plotlyOutput('channel'), 
-                      width = NULL, 
+                  width = 6,
+                  box(plotlyOutput('channel'),
+                      width = NULL,
                       solidHeader = TRUE)
-                ), 
-                
+                ),
+
                 # 第一列中第一行第二列，版本
                 column(
-                  width = 6, 
-                  box(plotlyOutput('versionCode'), 
-                      width = NULL, 
+                  width = 6,
+                  box(plotlyOutput('versionCode'),
+                      width = NULL,
                       solidHeader = TRUE)
                 )
-              ), 
-              
+              ),
+
               # 第一列中的第二行，渠道版本热图
               fluidRow(
-                box(plotlyOutput('channel_version_heatmap'), 
-                    width = NULL, 
+                box(plotlyOutput('channel_version_heatmap'),
+                    width = NULL,
                     solidHeader = TRUE)
               )
-            ), 
-            
+            ),
+
             # 第二列，参数
             column(
-              width = 3, 
-              box(checkboxInput('channel_null', 
-                                '去除无渠道来源的用户', 
-                                value = TRUE), 
-                  width = NULL, 
-                  solidHeader = TRUE, 
-                  background = 'red'), 
-              
-              box(checkboxInput('channel_other', 
-                                '去除其他渠道来源的用户', 
-                                value = FALSE), 
-                  width = NULL, 
-                  solidHeader = TRUE, 
-                  background = 'red'), 
-              
+              width = 3,
+              box(checkboxInput('channel_null',
+                                '去除无渠道来源的用户',
+                                value = TRUE),
+                  width = NULL,
+                  solidHeader = TRUE,
+                  background = 'red'),
+
+              box(checkboxInput('channel_other',
+                                '去除其他渠道来源的用户',
+                                value = FALSE),
+                  width = NULL,
+                  solidHeader = TRUE,
+                  background = 'red'),
+
               box(
-                tags$div(title = 'channel_userType'), 
+                tags$div(title = 'channel_userType'),
                 selectInput('channel_userType',
                             '用户类型',
                             choices = list(
-                              '全体用户' = 'all', 
-                              '存量用户' = 'old', 
+                              '全体用户' = 'all',
+                              '存量用户' = 'old',
                               '新增用户' = 'new'
-                            ), 
-                            selected = 'all'), 
-                width = NULL, 
+                            ),
+                            selected = 'all'),
+                width = NULL,
                 solidHeader = TRUE
-              ), 
-              
+              ),
+
               box(
-                tags$div(title = 'channel_date_range'), 
-                dateRangeInput('channel_date_range', 
-                               label = '选择统计区间', 
-                               min = min(app_start$time_stamp), 
-                               max = max(app_start$time_stamp), 
-                               start = max(app_start$time_stamp), 
-                               language = 'zh-CN'), 
-                width = NULL, 
+                tags$div(title = 'channel_date_range'),
+                dateRangeInput('channel_date_range',
+                               label = '选择统计区间',
+                               min = min(app_start$time_stamp),
+                               max = max(app_start$time_stamp),
+                               start = max(app_start$time_stamp),
+                               language = 'zh-CN'),
+                width = NULL,
                 solidHeader = TRUE
               )
             )

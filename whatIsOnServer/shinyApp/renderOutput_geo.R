@@ -30,10 +30,7 @@ output$app_start <- renderLeaflet({
   return(result)
 })
 
-# try https://github.com/rstudio/DT)
-output$app_start_top10 <- renderTable({
-  app_start_top10()
-})
+
 
 output$specific_user_geo_ui <- renderUI({
   if (input$user_name == 'sunlj') {
@@ -41,14 +38,17 @@ output$specific_user_geo_ui <- renderUI({
       selectizeInput(
         'specific_user_geo', 
         'sepcificUserGeo', 
-        choices = c('noSpecific', unique(app_start$user_id))
+        choices = c('noSpecific', unique(app_start$user_id)), 
+        selected = 'noSpecific'
       )
     )
   }
 })
 
-
-
+# try https://github.com/rstudio/DT)
+output$topArea <- renderTable({
+  app_start_topArea_data()
+})
 
 
 

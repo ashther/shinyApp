@@ -41,8 +41,7 @@ appStartRefresh <- function(now, app_start, con) {
                   WHEN 'A006' THEN 'oppo' 
                   WHEN 'A007' THEN '魅族' 
                   WHEN 'A008' THEN '华为' 
-                  WHEN 'A009' 
-                        OR 'B%' THEN '其他' 
+                  WHEN 'A009' THEN '其他'
                   WHEN 'appstore' THEN '苹果' 
                   ELSE a.app_channel_id 
                 END ), '缺失')            AS channel, 
@@ -195,8 +194,7 @@ res <- dbSendQuery(con, paste0("SELECT a.id,
                   WHEN 'A006' THEN 'oppo' 
                   WHEN 'A007' THEN '魅族' 
                   WHEN 'A008' THEN '华为' 
-                  WHEN 'A009' 
-                        OR 'B%' THEN '其他' 
+                  WHEN 'A009' THEN '其他'
                   WHEN 'appstore' THEN '苹果' 
                   ELSE a.app_channel_id 
                 END ), '缺失')            AS channel, 

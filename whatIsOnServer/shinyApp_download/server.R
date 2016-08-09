@@ -83,13 +83,18 @@ shinyServer(function(input, output, session) {
       )
       
       user_regist_temp <- eventReactive(input$select_button, {
-        result <- tryCatch({
-          rbind(
-            users, 
-            dataGet(max(users$注册时间), host, port, username, password, dbname, mobile_info)
-          )
-        }, error = function(e)return(users)) %>% 
-          filter(`注册时间` >= input$date[1] & `注册时间` <= input$date[2])
+        withProgress(message = '查询中...', value = 0, {
+          setProgress(0.2)
+          setProgress(0.5)
+          result <- tryCatch({
+            rbind(
+              users, 
+              dataGet(max(users$注册时间), host, port, username, password, dbname, mobile_info)
+            )
+          }, error = function(e)return(users)) %>% 
+            filter(`注册时间` >= input$date[1] & `注册时间` <= input$date[2])
+          setProgress(1)
+        })
         
         return(result)
       })

@@ -88,8 +88,8 @@ shinyServer(function(input, output, session) {
           setProgress(0.5)
           result <- tryCatch({
             rbind(
-              users, 
-              dataGet(max(users$注册时间), host, port, username, password, dbname, mobile_info)
+              dataGet(max(users$注册时间), host, port, username, password, dbname, mobile_info), 
+              users
             )
           }, error = function(e)return(users)) %>% 
             filter(`注册时间` >= input$date[1] & `注册时间` <= input$date[2])

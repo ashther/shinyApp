@@ -34,6 +34,14 @@ shinyServer(function(input, output, session) {
         )
       })
       
+      output$last_login_time_ui <- renderUI({
+        checkboxInput(
+          inputId = 'last_login_time', 
+          label = '最后登录时间', 
+          value = TRUE
+        )
+      })
+      
       output$phone_field_ui <- renderUI({
         checkboxInput(
           inputId = 'phone_field', 
@@ -88,7 +96,7 @@ shinyServer(function(input, output, session) {
           setProgress(0.5)
           result <- tryCatch({
             rbind(
-              dataGet(max(users$注册时间), host, port, username, password, dbname, mobile_info), 
+              dataGet(max(users$注册时间), host, port, username, password, dbname, mobile_info),
               users
             )
           }, error = function(e)return(users)) %>% 
@@ -112,6 +120,12 @@ shinyServer(function(input, output, session) {
         if (!input$regist_time) {
           tryCatch({
             result <- select(result, -`注册时间`)
+          }, error = function(e)e)
+        }
+        
+        if (!input$last_login_time) {
+          tryCatch({
+            result <- select(result, -`最后登录时间`)
           }, error = function(e)e)
         }
         

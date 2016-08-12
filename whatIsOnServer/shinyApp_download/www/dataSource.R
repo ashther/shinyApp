@@ -67,44 +67,53 @@ dataGet <- function(maxTimeStamp, host, port, username, password, dbname, mobile
   res <- dbSendQuery(con, 
                      paste0(
                        "SELECT a.id, 
-                     a.regist_time as '注册时间', 
-                     b.position_1name as '单位/学校', 
-                     c.app_channel_id as '渠道' 
-                     FROM   yz_sys_db.ps_account AS a 
-                     LEFT JOIN (SELECT account_id, 
-                                position_1name 
-                                FROM   (SELECT account_id, 
-                                        position_1name 
-                                        FROM   yz_app_person_db.ps_vitae_main 
-                                        WHERE  del_status = 0 
-                                        ORDER  BY status_time DESC) AS ps_vitae_main_temp 
-                                GROUP  BY account_id) AS b 
-                     ON a.id = b.account_id 
-                     LEFT JOIN (SELECT user_id, 
-                                CASE app_channel_id 
-                                WHEN 'A001' THEN '360' 
-                                WHEN 'A002' THEN '百度' 
-                                WHEN 'A003' THEN '腾讯' 
-                                WHEN 'A004' THEN '豌豆荚' 
-                                WHEN 'A005' THEN '小米' 
-                                WHEN 'A006' THEN 'oppo' 
-                                WHEN 'A007' THEN '魅族' 
-                                WHEN 'A008' THEN '华为' 
-                                WHEN 'A009' THEN '其他' 
-                                WHEN 'appstore' THEN '苹果' 
-                                ELSE app_channel_id 
-                                END AS app_channel_id 
-                                FROM   (SELECT user_id, 
-                                        app_channel_id 
-                                        FROM   yz_app_track_db.app_start 
-                                        WHERE  del_status = 0 
-                                        AND app_channel_id IS NOT NULL 
-                                        ORDER  BY create_time DESC) AS channel_temp 
-                                GROUP  BY 1) AS c 
-                     ON a.id = c.user_id 
-                     WHERE  a.id >= 20000 
-                     AND a.del_status = 0
-                     AND a.regist_time > ", 
+                       a.regist_time    AS '注册时间', 
+                       d.login_time     AS '最后登录时间', 
+                       b.position_1name AS '单位/学校', 
+                       c.app_channel_id AS '渠道' 
+                       FROM   yz_sys_db.ps_account AS a 
+                       LEFT JOIN (SELECT account_id, 
+                                  position_1name 
+                                  FROM   (SELECT account_id, 
+                                          position_1name 
+                                          FROM   yz_app_person_db.ps_vitae_main 
+                                          WHERE  del_status = 0 
+                                          ORDER  BY status_time DESC) AS ps_vitae_main_temp 
+                                  GROUP  BY account_id) AS b 
+                       ON a.id = b.account_id 
+                       LEFT JOIN (SELECT user_id, 
+                                  CASE app_channel_id 
+                                  WHEN 'A001' THEN '360' 
+                                  WHEN 'A002' THEN '百度' 
+                                  WHEN 'A003' THEN '腾讯' 
+                                  WHEN 'A004' THEN '豌豆荚' 
+                                  WHEN 'A005' THEN '小米' 
+                                  WHEN 'A006' THEN 'oppo' 
+                                  WHEN 'A007' THEN '魅族' 
+                                  WHEN 'A008' THEN '华为' 
+                                  WHEN 'A009' THEN '其他' 
+                                  WHEN 'appstore' THEN '苹果' 
+                                  ELSE app_channel_id 
+                                  END AS app_channel_id 
+                                  FROM   (SELECT user_id, 
+                                          app_channel_id 
+                                          FROM   yz_app_track_db.app_start 
+                                          WHERE  del_status = 0 
+                                          AND app_channel_id IS NOT NULL 
+                                          ORDER  BY create_time DESC) AS channel_temp 
+                                  GROUP  BY 1) AS c 
+                       ON a.id = c.user_id 
+                       LEFT JOIN (SELECT account_id, 
+                                  login_time 
+                                  FROM   (SELECT account_id, 
+                                          login_time 
+                                          FROM   yz_sys_db.ps_account_login_log 
+                                          ORDER  BY login_time DESC) AS login_temp 
+                                  GROUP  BY account_id) AS d 
+                       ON a.id = d.account_id 
+                       WHERE  a.id >= 20000 
+                       AND a.del_status = 0 
+                       AND a.regist_time > ", 
                        sprintf("'%s';", maxTimeStamp)
                      ))
   registInfo <- dbFetch(res, n = -1)

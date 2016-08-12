@@ -18,6 +18,7 @@ shinyUI(bootstrapPage(
                # uiOutput('field_ui'), 
                uiOutput('company_university_ui'), 
                uiOutput('regist_time_ui'), 
+               uiOutput('last_login_time_ui'), 
                uiOutput('phone_field_ui'), 
                uiOutput('channel_ui'), 
                uiOutput('date_ui'), 

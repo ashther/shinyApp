@@ -96,9 +96,11 @@ shinyServer(function(input, output, session) {
           setProgress(0.5)
           result <- tryCatch({
             rbind(
-              dataGet(max(users$注册时间), host, port, username, password, dbname, mobile_info),
-              users
-            )
+              dataGet(max(users$注册时间), host, port, username, 
+                      password, dbname, mobile_info),
+              select(users, -`最后登录时间`)
+            ) %>% 
+              lastLoginGet()
           }, error = function(e)return(users)) %>% 
             filter(`注册时间` >= input$date[1] & `注册时间` <= input$date[2])
           setProgress(1)

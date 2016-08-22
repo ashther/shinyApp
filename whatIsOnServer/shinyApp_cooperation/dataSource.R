@@ -59,7 +59,7 @@ con <- dbConnect(MySQL(), host = host, port = port,
                  dbname = dbname)
 # dbSendQuery(con, 'set names gbk')
 
-res <- dbSendQuery(con, 'select username as user, password as passwd 
+res <- dbSendQuery(con, 'select username as user, password as passwd, module
                    from shiny_data.shiny_user;')
 user_passwd <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {

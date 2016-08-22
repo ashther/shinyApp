@@ -54,17 +54,17 @@ hourlyDataRefresh <- function(now, hourly_data, con) {
     return(rbind(hourly_data, hourly_data_new[-1, ]))
 }
 
-city_location <- read.csv('city_location.csv', stringsAsFactors = FALSE, 
-                          row.names = NULL, fileEncoding = 'utf-8')
-city_with_quote <- paste0('\'', city_location$city, '\'')
-province_with_quote <- paste0('\'', unique(city_location$province), '\'')
+# city_location <- read.csv('city_location.csv', stringsAsFactors = FALSE, 
+#                           row.names = NULL, fileEncoding = 'utf-8')
+# city_with_quote <- paste0('\'', city_location$city, '\'')
+# province_with_quote <- paste0('\'', unique(city_location$province), '\'')
 
 con <- dbConnect(MySQL(), host = host, port = port, 
                  username = username, password = password, 
                  dbname = dbname)
 # dbSendQuery(con, 'set names gbk')
 
-res <- dbSendQuery(con, 'select username as user, password as passwd 
+res <- dbSendQuery(con, 'select username as user, password as passwd, module
                    from shiny_data.shiny_user;')
 user_passwd <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {

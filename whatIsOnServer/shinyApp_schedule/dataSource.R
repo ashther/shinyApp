@@ -59,7 +59,7 @@ con <- dbConnect(MySQL(), host = host, port = port,
                  dbname = dbname)
 # dbSendQuery(con, 'set names gbk')
 
-res <- dbSendQuery(con, 'select username as user, password as passwd 
+res <- dbSendQuery(con, 'select username as user, password as passwd, module 
                    from shiny_data.shiny_user;')
 user_passwd <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
@@ -168,6 +168,40 @@ monthly_schedule[is.na(monthly_schedule)] <- 0
 
 rm(dt, hr, wk, mt)
 
+# to get file_name from remote database
+eval(parse(file = 'config.cnf'))
+
+con <- dbConnect(MySQL(), host = host_app, port = port_app, 
+                 username = username_app, password = password_app, 
+                 dbname = dbname_app)
+
+res <- dbSendQuery(con, 
+                   "SELECT temp.file_name, 
+                   temp.category_name, 
+                   a.account_id, 
+                   a.opreate_type, 
+                   a.opreate_time 
+                   FROM   yz_app_schedule2_db.course_file_opreate_log AS a 
+                   LEFT JOIN (SELECT a.id, 
+                              a.file_name, 
+                              d.category_name 
+                              FROM   yz_app_schedule2_db.course_file_detail AS a 
+                              LEFT JOIN yz_app_course_resource_db.course_resource AS b 
+                              ON a.sourse_file_id = b.id 
+                              LEFT JOIN yz_app_course_resource_db.course_info AS c 
+                              ON b.course_id = c.id 
+                              LEFT JOIN yz_app_course_resource_db.course_category AS d 
+                              ON c.category_code = d.category_code) AS temp 
+                   ON a.file_id = temp.id 
+                   WHERE  a.del_status = 0; ")
+operate_log <- dbFetch(res, n = -1)
+while (dbMoreResults(con)) {
+  dbNextResult(con)
+}
+operate_log$opreate_time <- as.Date(operate_log$opreate_time)
+dbClearResult(res)
+dbDisconnect(con)
+rm(con, res, host_app, port_app, username_app, password_app, dbname_app)
 
 
 

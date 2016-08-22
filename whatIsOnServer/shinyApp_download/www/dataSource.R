@@ -18,7 +18,7 @@ dbClearResult(res)
 
 res <- dbSendQuery(con, 
                    "SELECT username AS user, 
-                   password AS passwd 
+                   password AS passwd, module 
                    FROM   shiny_data.shiny_user;")
 user_passwd <- dbFetch(res, n = -1)
 while (dbMoreResults(con)) {
@@ -68,7 +68,6 @@ dataGet <- function(maxTimeStamp, host, port, username, password, dbname, mobile
                      paste0(
                        "SELECT a.id, 
                        a.regist_time    AS '注册时间', 
-                       d.login_time     AS '最后登录时间', 
                        b.position_1name AS '单位/学校', 
                        c.app_channel_id AS '渠道' 
                        FROM   yz_sys_db.ps_account AS a 
@@ -103,14 +102,6 @@ dataGet <- function(maxTimeStamp, host, port, username, password, dbname, mobile
                                           ORDER  BY create_time DESC) AS channel_temp 
                                   GROUP  BY 1) AS c 
                        ON a.id = c.user_id 
-                       LEFT JOIN (SELECT account_id, 
-                                  login_time 
-                                  FROM   (SELECT account_id, 
-                                          login_time 
-                                          FROM   yz_sys_db.ps_account_login_log 
-                                          ORDER  BY login_time DESC) AS login_temp 
-                                  GROUP  BY account_id) AS d 
-                       ON a.id = d.account_id 
                        WHERE  a.id >= 20000 
                        AND a.del_status = 0 
                        AND a.regist_time > ", 
@@ -132,7 +123,35 @@ dataGet <- function(maxTimeStamp, host, port, username, password, dbname, mobile
     select(-field)
 }
 
-users <- dataGet('2016-01-01', host, port, username, password, dbname, mobile_info)
+lastLoginGet <- function(users) {
+  con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306, 
+                   username = 'r', password = '123456', 
+                   dbname = 'yz_sys_db')
+  res <- dbSendQuery(con, 
+                     "SELECT account_id, 
+                     DATE_FORMAT(login_time, '%Y-%m-%d %H:%i:00') AS login_time 
+                     FROM   (SELECT account_id, 
+                             login_time 
+                             FROM   yz_sys_db.ps_account_login_log 
+                             ORDER  BY login_time DESC) AS login_temp
+                     WHERE  account_id >= 20000
+                     GROUP  BY account_id")
+  last_login <- dbFetch(res, n = -1)
+  while (dbMoreResults(con)) {
+    dbNextResult(con)
+  }
+  dbClearResult(res)
+  dbDisconnect(con)
+  
+  result <- left_join(users, last_login, c('id' = 'account_id')) %>% 
+    select(id, `用户名`, `手机号`, `注册时间`, `最后登录时间` = login_time, 
+           `单位/学校`, `渠道`, `省份`, `城市`)
+  
+  return(result)
+}
+
+users <- dataGet('2016-01-01', host, port, username, password, dbname, mobile_info) %>% 
+  lastLoginGet()
 
 
 

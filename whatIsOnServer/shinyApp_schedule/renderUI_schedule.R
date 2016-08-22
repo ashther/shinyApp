@@ -46,3 +46,13 @@ output$help_text_ui_1 <- renderUI({
                     '而统计周期为月时，2016-04-01表示4月' )), 
     style = 'font-size:85%')
 })
+
+output$operate_date_range_ui <- renderUI({
+  dateRangeInput(
+    'operate_date_range', 
+    label = '选择统计区间', 
+    min = min(operate_log$opreate_time), 
+    max = max(operate_log$opreate_time), 
+    language = 'zh-CN'
+  )
+})

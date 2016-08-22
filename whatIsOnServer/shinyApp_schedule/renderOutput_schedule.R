@@ -47,3 +47,10 @@ output$schedule_plot <- renderDygraph({
         dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
         dyRangeSelector(dateWindow = input$calendar_date_range)
 })
+
+output$operate_table <- renderDataTable(
+  operate_data(), 
+  options = list(
+    pageLength = 25
+  )
+)

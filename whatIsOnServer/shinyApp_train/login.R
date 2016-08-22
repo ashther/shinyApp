@@ -17,7 +17,8 @@ output$pass <- renderText({
                     user_passwd$user == input$user_name &
                     user_passwd$passwd == digest(input$passwd, 
                                                  algo = 'xxhash64', 
-                                                 seed = 622),
+                                                 seed = 622) & 
+                    (user_passwd$module == 'train' | user_passwd$module == 'all'),
                     ]) > 0) {
                     login_check$logged <- TRUE
                 } else {

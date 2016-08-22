@@ -15,6 +15,9 @@ shinyUI(dashboardPage(
   dashboardSidebar(
     
     sidebarMenu(
+      menuItem('资源使用情况', 
+               tabName = 'operate', 
+               icon = icon('play-circle')), 
       menuItem('软课表', 
            tabName = 'schedule', 
            icon = icon('university'))
@@ -71,7 +74,35 @@ shinyUI(dashboardPage(
             uiOutput('help_text_ui_1')
           )
         )
+      ), 
+      
+      tabItem(
+        tabName = 'operate', 
+        
+        uiOutput('operate_date_range_ui'), 
+        
+        dataTableOutput('operate_table')
       )
     )
   )
 ))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

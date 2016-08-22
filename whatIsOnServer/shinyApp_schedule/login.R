@@ -15,7 +15,8 @@ output$pass <- renderText({
             if (input$login_button > 0) {
                 if (nrow(user_passwd[
                     user_passwd$user == input$user_name &
-                    user_passwd$passwd == digest::digest(input$passwd, algo = 'xxhash64', seed = 622),
+                    user_passwd$passwd == digest::digest(input$passwd, algo = 'xxhash64', seed = 622) &
+                    (user_passwd$module == 'schedule' | user_passwd$module == 'all'),
                     ]) > 0) {
                     login_check$logged <- TRUE
                 } else {

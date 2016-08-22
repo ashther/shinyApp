@@ -52,13 +52,13 @@ shinyServer(function(input, output, session) {
     if (input$demographic_university_select == '不限') {
       temp <- subset(
         demographic, regist_time >= as.POSIXct(input$demographic_dateRange_1[1]) & 
-          regist_time <= as.POSIXct(input$demographic_dateRange_1[2])
+          regist_time <= as.POSIXct(input$demographic_dateRange_1[2] + 1)
       ) 
     } else {
       temp <- subset(
         demographic, university == input$demographic_university_select & 
           regist_time >= as.POSIXct(input$demographic_dateRange_1[1]) & 
-          regist_time <= as.POSIXct(input$demographic_dateRange_1[2])
+          regist_time <= as.POSIXct(input$demographic_dateRange_1[2] + 1)
       )
     }
     return(temp)
@@ -115,7 +115,7 @@ shinyServer(function(input, output, session) {
       filter(!is.na(university) & 
              status_category == 1 & 
              regist_time >= as.POSIXct(input$demographic_dateRange_2[1]) & 
-             regist_time <= as.POSIXct(input$demographic_dateRange_2[2])) %>% 
+             regist_time <= as.POSIXct(input$demographic_dateRange_2[2] + 1)) %>% 
       group_by(university) %>% 
       summarise(n = n()) %>% 
       ungroup() %>% 

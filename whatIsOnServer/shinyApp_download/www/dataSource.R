@@ -39,7 +39,8 @@ dataGet <- function(maxTimeStamp, host, port, username, password, dbname, mobile
                      paste0(
                        "SELECT a.id, 
                      b.full_name AS '用户名', 
-                     a.username  AS '手机号' 
+                     a.username  AS '手机号' , 
+                     a.regist_time AS '注册时间'
                      FROM   yz_sys_db.ps_account AS a 
                      LEFT JOIN yz_app_person_db.ps_attribute_variety AS b 
                      ON a.id = b.account_id 
@@ -67,7 +68,6 @@ dataGet <- function(maxTimeStamp, host, port, username, password, dbname, mobile
   res <- dbSendQuery(con, 
                      paste0(
                        "SELECT a.id, 
-                       a.regist_time    AS '注册时间', 
                        b.position_1name AS '单位/学校', 
                        c.app_channel_id AS '渠道' 
                        FROM   yz_sys_db.ps_account AS a 

@@ -1,4 +1,24 @@
 
+output$hourly_login_plot_select_render <- renderUI({
+  selectInput(inputId = 'hourly_login_plot_select', 
+              label = '选择指标', 
+              choices = list(
+                '新增用户数' = 'new', 
+                '活跃用户数' = 'active', 
+                '登陆次数' = 'log_in'
+              ), selected = 'active')
+})
+
+output$hourly_login_plot_compare_render <- renderUI({
+  selectInput(inputId = 'hourly_login_plot_compare', 
+              label = '选择对比时间段', 
+              choices = list(
+                '昨日' = '1day', 
+                '7日' = '7days', 
+                '30日' = '30days'
+              ), selected = '1day')
+})
+
 output$login_date_format_render <- renderUI({
     selectInput(inputId = 'login_date_format',
                 label = '选择统计周期',

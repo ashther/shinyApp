@@ -63,7 +63,17 @@ shinyUI(dashboardPage(
         ), 
         
         fluidRow(
-          dygraphOutput('hourly_login_plot')
+          column(
+            width = 8, 
+            dygraphOutput('hourly_login_plot')
+          ), 
+          
+          column(
+            width = 4, 
+            uiOutput('hourly_login_plot_select_render'), 
+            
+            uiOutput('hourly_login_plot_compare_render')
+          )
         ), 
         
         br(), 

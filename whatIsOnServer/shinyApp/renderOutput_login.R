@@ -1,16 +1,31 @@
 
+# output$hourly_login_plot <- renderDygraph({
+#     dygraph(cbind(hourly_new, hourly_active), 
+#             main = '新增及活跃用户数（每小时）') %>% 
+#         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
+#         dyAxis('y', independentTicks = TRUE) %>% 
+#         dyAxis('y2', independentTicks = FALSE) %>% 
+#         dySeries('new', label = '新增用户数', axis = 'y') %>% 
+#         dySeries('active', label = '活跃用户数', axis = 'y2') %>%
+#         dyOptions(fillGraph = FALSE, fillAlpha = 0.2) %>% 
+#         dyLegend(show = 'always', hideOnMouseOut = TRUE) %>% 
+#         dyRangeSelector(dateWindow = c(as.POSIXct(Sys.Date() - 1), 
+#                                        Sys.time()))
+# })
+
 output$hourly_login_plot <- renderDygraph({
-    dygraph(cbind(hourly_new, hourly_active), 
-            main = '新增及活跃用户数（每小时）') %>% 
-        dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
-        dyAxis('y', independentTicks = TRUE) %>% 
-        dyAxis('y2', independentTicks = FALSE) %>% 
-        dySeries('new', label = '新增用户数', axis = 'y') %>% 
-        dySeries('active', label = '活跃用户数', axis = 'y2') %>%
-        dyOptions(fillGraph = FALSE, fillAlpha = 0.2) %>% 
-        dyLegend(show = 'always', hideOnMouseOut = TRUE) %>% 
-        dyRangeSelector(dateWindow = c(as.POSIXct(Sys.Date() - 1), 
-                                       Sys.time()))
+  if (!is.null(hourly_login_plot_data())) {
+    plot_data <- hourly_login_plot_data()
+    dygraph(plot_data$dat, 
+            main = plot_data$main_title) %>% 
+      dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
+      dySeries(names(plot_data$dat[, 1]), label = plot_data$label[1]) %>%
+      dySeries(names(plot_data$dat[, 2]), label = plot_data$label[2]) %>%
+      dyOptions(fillGraph = FALSE, fillAlpha = 0.2) %>% 
+      dyLegend(show = 'follow', hideOnMouseOut = TRUE) %>% 
+      dyRangeSelector(dateWindow = c(as.POSIXct(format(Sys.Date(), '%Y-%m-%d 00:00:00')), 
+                                     as.POSIXct(format(Sys.Date(), '%Y-%m-%d 23:00:00'))))
+  }
 })
 
 # 累计用户数

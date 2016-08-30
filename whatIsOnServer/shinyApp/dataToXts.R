@@ -6,6 +6,36 @@ names(hourly_active) <- 'active'
 hourly_log_in <- xts(hourly_login$login, order.by = hourly_login$date_time)
 names(hourly_log_in) <- 'login'
 
+hourly_active_7days <- xts(hourly_login_7days$active_7days, 
+                           order.by = hourly_login_7days$date_time)
+names(hourly_active_7days) <- 'active_7days'
+hourly_new_7days <- xts(hourly_login_7days$new_7days, 
+                           order.by = hourly_login_7days$date_time)
+names(hourly_new_7days) <- 'new_7days'
+hourly_log_in_7days <- xts(hourly_login_7days$log_in_7days, 
+                           order.by = hourly_login_7days$date_time)
+names(hourly_log_in_7days) <- 'log_in_7days'
+
+hourly_active_30days <- xts(hourly_login_30days$active_30days, 
+                           order.by = hourly_login_30days$date_time)
+names(hourly_active_30days) <- 'active_30days'
+hourly_new_30days <- xts(hourly_login_30days$new_30days, 
+                        order.by = hourly_login_30days$date_time)
+names(hourly_new_30days) <- 'new_30days'
+hourly_log_in_30days <- xts(hourly_login_30days$log_in_30days, 
+                           order.by = hourly_login_30days$date_time)
+names(hourly_log_in_30days) <- 'log_in_30days'
+
+hourly_active_1day <- xts(hourly_login_1day$active_1day, 
+                           order.by = hourly_login_1day$date_time)
+names(hourly_active_1day) <- 'active_1day'
+hourly_new_1day <- xts(hourly_login_1day$new_1day, 
+                        order.by = hourly_login_1day$date_time)
+names(hourly_new_1day) <- 'new_1day'
+hourly_log_in_1day <- xts(hourly_login_1day$log_in_1day, 
+                           order.by = hourly_login_1day$date_time)
+names(hourly_log_in_1day) <- 'log_in_1day'
+
 daily_new <- xts(daily_login$new, order.by = daily_login$date_time)
 names(daily_new) <- 'new'
 daily_active <- xts(daily_login$active, order.by = daily_login$date_time)

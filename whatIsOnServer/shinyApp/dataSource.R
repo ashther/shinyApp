@@ -297,6 +297,33 @@ hourly_login <- left_join(hr, hourly_login, by = 'date_time') %>%
     select(date_time, new, active, login)
 hourly_login[is.na(hourly_login)] <- 0
 
+hourly_login_7days <- hourly_login %>% 
+  filter(date_time >= as.POSIXct(format(Sys.Date() - 7, '%Y-%m-%d 00:00:00')) & 
+           date_time < as.POSIXct(format(Sys.Date(), '%Y-%m-%d 00:00:00'))) %>% 
+  mutate(date_time = paste(Sys.Date(), format(date_time, '%H:00:00'), ' ')) %>% 
+  group_by(date_time) %>% 
+  summarise(active_7days = mean(active, na.rm = FALSE), 
+            new_7days = mean(new, na.rm = FALSE), 
+            log_in_7days = mean(login, na.rm = FALSE))
+hourly_login_7days$date_time <- as.POSIXct(hourly_login_7days$date_time)
+
+hourly_login_30days <- hourly_login %>% 
+  filter(date_time >= as.POSIXct(format(Sys.Date() - 30, '%Y-%m-%d 00:00:00')) & 
+           date_time < as.POSIXct(format(Sys.Date(), '%Y-%m-%d 00:00:00'))) %>% 
+  mutate(date_time = paste(Sys.Date(), format(date_time, '%H:00:00'), ' ')) %>% 
+  group_by(date_time) %>% 
+  summarise(active_30days = mean(active, na.rm = FALSE), 
+            new_30days = mean(new, na.rm = FALSE), 
+            log_in_30days = mean(login, na.rm = FALSE))
+hourly_login_30days$date_time <- as.POSIXct(hourly_login_30days$date_time)
+
+hourly_login_1day <- hourly_login %>% 
+  filter(date_time >= as.POSIXct(format(Sys.Date() - 1, '%Y-%m-%d 00:00:00')) & 
+           date_time < as.POSIXct(format(Sys.Date(), '%Y-%m-%d 00:00:00'))) %>% 
+  mutate(date_time = paste(Sys.Date(), format(date_time, '%H:00:00'), ' ')) %>%
+  rename(active_1day = active, new_1day = new, log_in_1day = login)
+hourly_login_1day$date_time <- as.POSIXct(hourly_login_1day$date_time)
+
 # =============================================================================
 
 wk <- data.frame(first_weekday = seq(from = min(weekly_login$first_weekday),

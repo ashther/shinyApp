@@ -23,6 +23,46 @@ shinyServer(function(input, output, session) {
     }
   })
   
+  hourly_login_plot_data <- reactive({
+    if (!is.null(input$hourly_login_plot_select) && 
+        !is.null(input$hourly_login_plot_compare)) {
+      
+      dat <- paste0('hourly_', input$hourly_login_plot_select, ', ', 
+                    'hourly_', input$hourly_login_plot_select, '_', 
+                    input$hourly_login_plot_compare) %>% 
+        sprintf("cbind(%s)", .) %>% 
+        parse(text = .) %>% 
+        eval()
+      
+      result <- switch(input$hourly_login_plot_select,
+             'new' = list(dat = dat, 
+                          main_title = '新增用户数', 
+                          label = c('今日', 
+                                    switch(input$hourly_login_plot_compare,
+                                      '1day' = '昨日', 
+                                      '7days' = '7日平均', 
+                                      '30days' = '30日平均'
+                                    ))), 
+             'active' = list(dat = dat, 
+                             main_title = '活跃用户数', 
+                             label = c('今日', 
+                                       switch(input$hourly_login_plot_compare,
+                                              '1day' = '昨日', 
+                                              '7days' = '7日平均', 
+                                              '30days' = '30日平均'
+                                       ))), 
+             'log_in' = list(dat = dat, 
+                             main_title = '登录次数', 
+                             label = c('今日', 
+                                       switch(input$hourly_login_plot_compare,
+                                              '1day' = '昨日', 
+                                              '7days' = '7日平均', 
+                                              '30days' = '30日平均'
+                                       )))
+      )
+    }
+  })
+  
   # 登录数据筛选
   login_data <- reactive({
     if (!is.null(input$login_date_format) && !is.null(input$login_data_type)) {

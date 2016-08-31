@@ -1,15 +1,19 @@
 
 output$demographic_age_plot <- renderPlotly({
-  (ggplot(demographic_age_data(), aes(x = age)) +
-     geom_density(stat = 'density', fill = "blue", alpha = 0.2) +
-     xlab('年龄') +
-     ggtitle(
-       sprintf('图1：%s年龄分布（核密度曲线）',
-               ifelse(input$demographic_university_select == '不限',
-                      '全体用户',
-                      input$demographic_university_select))
-     )) %>%
-    ggplotly()
+  if (is.null(demographic_age_data())) {
+    return(NULL)
+  } else {
+    plot_ly(x = demographic_age_data()$x, 
+            y = demographic_age_data()$y, 
+            mode = 'lines', 
+            fill = 'tozeroy') %>% 
+      layout(title = sprintf('图1：%s年龄分布',
+                             ifelse(input$demographic_university_select == '不限',
+                                    '全体用户',
+                                    input$demographic_university_select)), 
+             xaxis = list(title = '年龄'), 
+             yaxis = list(title = '概率密度'))
+  }
 })
 
 output$demographic_gender_plot <- renderPlotly({

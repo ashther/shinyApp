@@ -206,7 +206,7 @@ shinyUI(dashboardPage(
       ),
       
       tabItem(
-        tabName = 'demographic', 
+        tabName = 'demographic',
         
         fluidRow(
           column(width = 9, 

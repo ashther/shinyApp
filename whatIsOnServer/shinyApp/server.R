@@ -114,7 +114,16 @@ shinyServer(function(input, output, session) {
                age >= quantile(temp$age, 0.25, na.rm = TRUE) - 1.5 * IQR(temp$age, na.rm = TRUE))
       
     }
-    return(temp)
+    temp <- as.numeric(na.omit(temp$age))
+    
+    if (length(temp) == 0) {
+      return(NULL)
+    } else if (length(temp) == 1) {
+      # Error in density.default(1) : 
+      # need at least 2 points to select a bandwidth automatically
+      temp <- c(temp, temp)
+    }
+    return(density(temp))
   })
   
   demographic_degree_data <- reactive({
@@ -156,6 +165,7 @@ shinyServer(function(input, output, session) {
              status_category == 1 & 
              regist_time >= as.POSIXct(input$demographic_dateRange_2[1]) & 
              regist_time <= as.POSIXct(input$demographic_dateRange_2[2] + 1)) %>% 
+      mutate(university = stringr::str_trim(university)) %>% 
       group_by(university) %>% 
       summarise(n = n()) %>% 
       ungroup() %>% 

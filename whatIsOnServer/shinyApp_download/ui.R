@@ -15,13 +15,11 @@ shinyUI(bootstrapPage(
     fluidRow(
         column(width = 1), 
         column(width = 3, 
-               # uiOutput('field_ui'), 
                uiOutput('company_university_ui'), 
                uiOutput('regist_time_ui'), 
                uiOutput('last_login_time_ui'), 
                uiOutput('phone_field_ui'), 
                uiOutput('channel_ui'), 
-               uiOutput('date_ui'), 
                uiOutput('button_ui'),
                htmlOutput('helptext_ui')
                ), 

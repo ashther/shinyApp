@@ -19,54 +19,65 @@ shinyServer(function(input, output, session) {
     if (login_data$logged == TRUE) {
       
       output$company_university_ui <- renderUI({
-        checkboxInput(
+        choices <- unique(users$`单位/学校`)
+        choices[is.na(choices)] <- '缺失'
+        choices <- c('不限', choices)
+        
+        selectizeInput(
           inputId = 'company_university', 
           label = '单位/学校', 
-          value = TRUE
+          choices = choices, 
+          selected = '不限'
         )
       })
       
       output$regist_time_ui <- renderUI({
-        checkboxInput(
+        dateRangeInput(
           inputId = 'regist_time', 
           label = '注册时间', 
-          value = TRUE
-        )
-      })
-      
-      output$last_login_time_ui <- renderUI({
-        checkboxInput(
-          inputId = 'last_login_time', 
-          label = '最后登录时间', 
-          value = TRUE
-        )
-      })
-      
-      output$phone_field_ui <- renderUI({
-        checkboxInput(
-          inputId = 'phone_field', 
-          label = '用户手机归属地（需要用户手机号）', 
-          value = TRUE
-        )
-      })
-      
-      output$channel_ui <- renderUI({
-        checkboxInput(
-          inputId = 'channel', 
-          label = '渠道', 
-          value = TRUE
-        )
-      })
-      
-      output$date_ui <- renderUI({
-        dateRangeInput(
-          inputId = 'date', 
-          label = '选择注册时间', 
           min = '2016-04-28', 
           max = Sys.Date(), 
           start = '2016-04-28', 
           end = Sys.Date(), 
           language = 'zh-CN'
+        )
+      })
+      
+      output$last_login_time_ui <- renderUI({
+        dateRangeInput(
+          inputId = 'last_login_time', 
+          label = '最后登录时间', 
+          min = '2016-04-28', 
+          max = Sys.Date(), 
+          start = '2016-04-28', 
+          end = Sys.Date(), 
+          language = 'zh-CN'
+        )
+      })
+      
+      output$phone_field_ui <- renderUI({
+        choices <- unique(paste(users$`省份`, users$`城市`, sep = '-'))
+        choices[is.na(choices)] <- '缺失'
+        choices <- c('不限', choices)
+        
+        selectizeInput(
+          inputId = 'phone_field', 
+          label = '用户手机号归属地', 
+          choices = choices, 
+          selected = '不限'
+        )
+      })
+      
+      output$channel_ui <- renderUI({
+        choices <- unique(users$`渠道`)
+        choices[is.na(choices)] <- '缺失'
+        choices <- c('不限', choices)
+        
+        selectizeInput(
+          inputId = 'channel', 
+          label = '渠道', 
+          choices = choices, 
+          selected = '不限'
         )
       })
       
@@ -101,8 +112,7 @@ shinyServer(function(input, output, session) {
               select(users, -`最后登录时间`)
             ) %>% 
               lastLoginGet()
-          }, error = function(e)return(users)) %>% 
-            filter(`注册时间` >= input$date[1] & `注册时间` <= input$date[2])
+          }, error = function(e)return(users))
           setProgress(1)
         })
         
@@ -111,36 +121,44 @@ shinyServer(function(input, output, session) {
       
       user_regist_data <- reactive({
         
-        result <- user_regist_temp()
+        result <- user_regist_temp() %>% 
+          filter(`注册时间` >= input$regist_time[1] & 
+                   `注册时间` <= input$regist_time[2] & 
+                   ((`最后登录时间` >= input$last_login_time[1] & 
+                       `最后登录时间` <= input$last_login_time[2]) |
+                      is.na(`最后登录时间`)))
         
-        if (!input$company_university) {
-          tryCatch({
-            result <- select(result, -`单位/学校`)
-          }, error = function(e)e)
+        if (input$company_university != '不限') {
+          if (input$company_university != '缺失') {
+            result <- result %>% 
+              filter(`单位/学校` == input$company_university)
+          } else {
+            result <- result %>% 
+              filter(is.na(`单位/学校`))
+          }
         }
         
-        if (!input$regist_time) {
-          tryCatch({
-            result <- select(result, -`注册时间`)
-          }, error = function(e)e)
+        if (input$channel != '不限') {
+          if (input$channel != '缺失') {
+            result <- result %>% 
+              filter(`渠道` == input$channel)
+          } else {
+            result <- result %>% 
+              filter(is.na(`渠道`))
+          }
         }
         
-        if (!input$last_login_time) {
-          tryCatch({
-            result <- select(result, -`最后登录时间`)
-          }, error = function(e)e)
-        }
-        
-        if (!input$phone_field) {
-          tryCatch({
-            result <- select(result, -`省份`, -`城市`)
-          }, error = function(e)e)
-        }
-        
-        if (!input$channel) {
-          tryCatch({
-            result <- select(result, -`渠道`)
-          }, error = function(e)e)
+        if (input$phone_field != '不限') {
+          
+          
+          if (input$phone_field != '缺失') {
+            temp <- unlist(strsplit(input$phone_field, '-'))
+            result <- result %>% 
+              filter(`省份` == temp[1] & `城市` == temp[2])
+          } else {
+            result <- result %>% 
+              filter(is.na(`省份`))
+          }
         }
         
         return(result)

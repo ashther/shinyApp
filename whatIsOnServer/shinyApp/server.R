@@ -171,7 +171,7 @@ shinyServer(function(input, output, session) {
       ungroup() %>% 
       mutate(r = rank(n, ties.method = 'random')) %>% 
       top_n(10, r) %>% 
-      arrange(desc(r)) %>% 
+      arrange(r) %>% 
       select(university, n)
   })
   

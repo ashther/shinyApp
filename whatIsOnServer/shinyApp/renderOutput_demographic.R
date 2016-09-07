@@ -42,12 +42,14 @@ output$demographic_degree_plot <- renderPlotly({
 
 output$demographic_university_top10 <- renderPlotly({
   plot_ly(demographic_university_top10(), 
-          x = university, 
-          y = n, 
-          type = 'bar') %>% 
+          x = n, 
+          y = university, 
+          type = 'bar', 
+          orientation = 'h') %>% 
     layout(title = '图4：用户所属院校TOP10', 
-           xaxis = list(title = '', 
-                        size = 10))
+           xaxis = list(title = '用户数'), 
+           yaxis = list(title = ''), 
+           margin = list(l = 150))
 })
 
 # output$test <- renderPrint({

@@ -1,18 +1,4 @@
 
-# output$hourly_login_plot <- renderDygraph({
-#     dygraph(cbind(hourly_new, hourly_active), 
-#             main = '新增及活跃用户数（每小时）') %>% 
-#         dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>% 
-#         dyAxis('y', independentTicks = TRUE) %>% 
-#         dyAxis('y2', independentTicks = FALSE) %>% 
-#         dySeries('new', label = '新增用户数', axis = 'y') %>% 
-#         dySeries('active', label = '活跃用户数', axis = 'y2') %>%
-#         dyOptions(fillGraph = FALSE, fillAlpha = 0.2) %>% 
-#         dyLegend(show = 'always', hideOnMouseOut = TRUE) %>% 
-#         dyRangeSelector(dateWindow = c(as.POSIXct(Sys.Date() - 1), 
-#                                        Sys.time()))
-# })
-
 output$hourly_login_plot <- renderDygraph({
   if (!is.null(hourly_login_plot_data())) {
     plot_data <- hourly_login_plot_data()
@@ -91,4 +77,5 @@ output$login_plot_2 <- renderDygraph({
         dyRangeSelector(dateWindow = input$login_date_range_freq)
     }
 })
+
 

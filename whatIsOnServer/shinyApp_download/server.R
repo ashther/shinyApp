@@ -1,5 +1,7 @@
-
-source('www/dataSource.R', local = TRUE)
+library(ggplot2)
+library(RMySQL)
+library(dplyr)
+source('www/dataSource.R')
 
 logged <- FALSE
 

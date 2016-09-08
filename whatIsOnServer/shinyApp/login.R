@@ -1,3 +1,4 @@
+
 output$uiLogin <- renderUI({
     if (login_check$logged == FALSE) {
         wellPanel(
@@ -26,3 +27,4 @@ output$pass <- renderText({
         }
     }
 })
+

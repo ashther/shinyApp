@@ -1,7 +1,5 @@
 
-library(ggplot2)
-library(RMySQL)
-library(dplyr)
+
 shinyUI(bootstrapPage(
     
     tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'), 

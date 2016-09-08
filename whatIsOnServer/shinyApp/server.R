@@ -1,7 +1,4 @@
 
-# user_passwd <- data.frame(user = c('sunlj', 'zhoumn', 'zhangp', 'chenmq', 'yyzx'), 
-#               passwd = c('sunlj', 'zhoumn', 'zhangp', 'chenmq', 'yyzx123'), 
-#               stringsAsFactors = FALSE)
 logged <- FALSE
 
 shinyServer(function(input, output, session) {
@@ -9,8 +6,10 @@ shinyServer(function(input, output, session) {
   login_check <- reactiveValues(logged = logged)
   
   source('login.R', encoding = 'utf-8', local = TRUE)
+
   # 载入数据刷新过程
   source('dataRefresh.R', encoding = 'utf-8', local = TRUE)
+
   # 载入数据框转时间序列过程
   source('dataToXts.R', encoding = 'utf-8', local = TRUE)
   
@@ -20,6 +19,7 @@ shinyServer(function(input, output, session) {
     if (login_check$logged == TRUE) {
       source('renderUI_login.R', encoding = 'utf-8', local = TRUE)
       source('shinyServerLog.R', encoding = 'utf-8', local = TRUE)
+      
     }
   })
   
@@ -62,7 +62,7 @@ shinyServer(function(input, output, session) {
       )
     }
   })
-  
+
   # 登录数据筛选
   login_data <- reactive({
     if (!is.null(input$login_date_format) && !is.null(input$login_data_type)) {
@@ -70,7 +70,7 @@ shinyServer(function(input, output, session) {
     }
     
   })
-  
+
   # 日登陆频次数据筛选
   login_freq_data <- reactive({
     if (!is.null(input$login_data_type_freq) && !is.null(input$login_freq_type)) {
@@ -80,13 +80,14 @@ shinyServer(function(input, output, session) {
         eval()
     }
   })
-  
+
   # 用户登陆后渲染首页输出图表
   observe({
     if (login_check$logged == TRUE) { 
       source('renderOutput_login.R', encoding = 'utf-8', local = TRUE)
     }
   })
+
   # demographic =============================================================
   demographic_temp_data <- reactive({
     if (input$demographic_university_select == '不限') {
@@ -103,7 +104,7 @@ shinyServer(function(input, output, session) {
     }
     return(temp)
   })
-  
+
   demographic_age_data <- reactive({
     
     temp <- demographic_temp_data()
@@ -125,7 +126,7 @@ shinyServer(function(input, output, session) {
     }
     return(density(temp))
   })
-  
+
   demographic_degree_data <- reactive({
     
     temp <- demographic_temp_data()
@@ -145,7 +146,7 @@ shinyServer(function(input, output, session) {
     temp$degree[temp$degree == '7'] <- '初中及以下'
     return(temp)
   })
-  
+
   demographic_gender_data <- reactive({
     
     temp <- demographic_temp_data()
@@ -158,7 +159,7 @@ shinyServer(function(input, output, session) {
 
     return(temp)
   })
-  
+
   demographic_university_top10 <- reactive({
     demographic %>% 
       filter(!is.na(university) & 
@@ -174,17 +175,18 @@ shinyServer(function(input, output, session) {
       arrange(r) %>% 
       select(university, n)
   })
-  
+
   demographic_heatmap_data <- reactive({
     demographic[demographic$university %in% demographic_university_top10()$university, 
           c('university', 'degree')]
   })
-  
+
   observe({
     if (login_check$logged == TRUE) {
       source('renderOutput_demographic.R', encoding = 'utf-8', local = TRUE)
     }
   })
+
   # geo======================================================================
   
   app_start_dateRange_data <- reactive({
@@ -193,7 +195,7 @@ shinyServer(function(input, output, session) {
         app_start$time_stamp <= input$app_start_date_range[2], 
       ]
   })
-  
+
   app_start_data <- reactive({
     if (is.null(input$specific_user_geo) || input$specific_user_geo == 'noSpecific') {
       return(
@@ -214,7 +216,7 @@ shinyServer(function(input, output, session) {
       )
     }
   })
-  
+
   app_start_topArea_data <- reactive({
     
     if (nrow(app_start_data()) == 0) {
@@ -242,13 +244,14 @@ shinyServer(function(input, output, session) {
                         row.names = NULL))
     }
   })
-  
+
   # 渲染地图模块输出图表
   observe({
     if (login_check$logged == TRUE) {
       source('renderOutput_geo.R', encoding = 'utf-8', local = TRUE)
     }
   })
+
   # channel==================================================================
   
   channel_dateRange_data <- reactive({
@@ -291,7 +294,9 @@ shinyServer(function(input, output, session) {
       source('renderOutput_channel.R', encoding = 'utf-8', local = TRUE)
     }
   })
+  
 })
+
 
 
 

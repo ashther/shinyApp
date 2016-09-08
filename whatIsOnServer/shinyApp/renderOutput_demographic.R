@@ -52,6 +52,3 @@ output$demographic_university_top10 <- renderPlotly({
            margin = list(l = 150))
 })
 
-# output$test <- renderPrint({
-#   sprintf('%s, %s',input$demographic_dateRange_2[1], input$demographic_dateRange_2[2])
-# }) # print_to_test

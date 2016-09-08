@@ -39,3 +39,4 @@ output$channel_version_heatmap <- renderPlotly({
                         size = 10), 
            yaxis = list(title = '版本号'))
 })
+

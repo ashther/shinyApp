@@ -1,3 +1,4 @@
+
 con <- dbConnect(MySQL(), host = host, port = port, 
                  username = username, password = password, 
                  dbname = dbname)
@@ -21,3 +22,4 @@ dbSendQuery(
 
 dbDisconnect(con)
 rm(con)
+

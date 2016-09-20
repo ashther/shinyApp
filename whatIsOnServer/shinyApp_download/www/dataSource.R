@@ -1,12 +1,13 @@
-dataSouce_filename <- paste0('dataSource_', format(Sys.Date(), '%Y%m%d'), '.rda')
+dataSource_filename <- paste0('dataSource_', format(Sys.Date(), '%Y%m%d'), '.rda')
 
-if (!file.exists(dataSouce_filename)) {
+if (!file.exists(dataSource_filename)) {
   
-  eval(parse(file = '/srv/shiny-server/download/www/config.cnf'))
+  eval(parse(file = 'www/config.cnf'))
   
-  con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306, 
-                   username = 'r', password = '123456', 
+  con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306,
+                   username = 'r', password = '123456',
                    dbname = 'shiny_data')
+  dbSendQuery(con, 'set names gbk')
   
   res <- dbSendQuery(con, 
                      "SELECT field, 
@@ -36,6 +37,7 @@ if (!file.exists(dataSouce_filename)) {
     con_app <- dbConnect(MySQL(), host = host, port = port, 
                          username = username, password = password, 
                          dbname = dbname)
+    dbSendQuery(con_app, 'set names gbk')
     
     res <- dbSendQuery(con_app, 
                        paste0(
@@ -66,6 +68,7 @@ if (!file.exists(dataSouce_filename)) {
     con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306, 
                      username = 'r', password = '123456', 
                      dbname = 'shiny_data')
+    dbSendQuery(con, 'set names gbk')
     
     res <- dbSendQuery(con, 
                        paste0(
@@ -93,6 +96,10 @@ if (!file.exists(dataSouce_filename)) {
                          WHEN 'A007' THEN '魅族' 
                          WHEN 'A008' THEN '华为' 
                          WHEN 'A009' THEN '其他' 
+                         WHEN 'A010' THEN '搜狗'
+                         WHEN 'A011' THEN '联想'
+                         WHEN 'A012' THEN 'vivo'
+                         WHEN 'A013' THEN '三星'
                          WHEN 'appstore' THEN '苹果' 
                          ELSE app_channel_id 
                          END AS app_channel_id 
@@ -129,6 +136,7 @@ if (!file.exists(dataSouce_filename)) {
     con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306, 
                      username = 'r', password = '123456', 
                      dbname = 'yz_sys_db')
+    dbSendQuery(con, 'set names gbk')
     res <- dbSendQuery(con, 
                        "SELECT account_id, 
                      DATE_FORMAT(login_time, '%Y-%m-%d %H:%i:00') AS login_time 
@@ -155,9 +163,9 @@ if (!file.exists(dataSouce_filename)) {
   users <- dataGet('2016-01-01', host, port, username, password, dbname, mobile_info) %>% 
     lastLoginGet()
   
-  save(list = ls(), file = dataSouce_filename)
+  save(list = ls(), file = dataSource_filename)
 } else {
-  load(dataSouce_filename)
+  load(dataSource_filename)
 }
 
 

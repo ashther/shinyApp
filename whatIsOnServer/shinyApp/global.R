@@ -44,6 +44,10 @@ if (!file.exists(dataSouce_filename)) {
         WHEN 'A007' THEN '魅族' 
         WHEN 'A008' THEN '华为' 
         WHEN 'A009' THEN '其他'
+        WHEN 'A010' THEN '搜狗'
+        WHEN 'A011' THEN '联想'
+        WHEN 'A012' THEN 'vivo'
+        WHEN 'A013' THEN '三星'
         WHEN 'appstore' THEN '苹果' 
         ELSE a.app_channel_id 
         END ), '缺失')            AS channel, 
@@ -128,10 +132,7 @@ if (!file.exists(dataSouce_filename)) {
   }
   dbClearResult(res)
   
-  res <- dbSendQuery(con, "select province, city, lng, lat 
-                     from shiny_data.cityInfo
-                     where country in ('China', 'Canada')
-                     or iso3 = 'USA';")
+  res <- dbSendQuery(con, "SELECT * FROM shiny_data.lat_lon_city;")
   city_location <- dbFetch(res, n = -1)
   while (dbMoreResults(con)) {
     dbNextResult(con)
@@ -197,6 +198,10 @@ if (!file.exists(dataSouce_filename)) {
                                  WHEN 'A007' THEN '魅族' 
                                  WHEN 'A008' THEN '华为' 
                                  WHEN 'A009' THEN '其他'
+                                 WHEN 'A010' THEN '搜狗'
+                                 WHEN 'A011' THEN '联想'
+                                 WHEN 'A012' THEN 'vivo'
+                                 WHEN 'A013' THEN '三星'
                                  WHEN 'appstore' THEN '苹果' 
                                  ELSE a.app_channel_id 
                                  END ), '缺失')            AS channel, 

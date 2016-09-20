@@ -5,7 +5,7 @@ output$app_start <- renderLeaflet({
   result <- app_start_data() %>% 
     leaflet() %>% 
     addTiles(urlTemplate = 'http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png') %>% 
-    setView(lng = mean(city_location$lng[city_location$city == input$app_start_city]),
+    setView(lng = mean(city_location$lon[city_location$city == input$app_start_city]),
             lat = mean(city_location$lat[city_location$city == input$app_start_city]),
             zoom = 12)
   
@@ -46,9 +46,12 @@ output$specific_user_geo_ui <- renderUI({
 })
 
 # try https://github.com/rstudio/DT)
-output$topArea <- renderTable({
-  app_start_topArea_data()
-})
+output$topArea <- renderTable(
+  app_start_topArea_data(), 
+  striped = TRUE, 
+  hover = TRUE, 
+  align = 'c'
+)
 
 
 

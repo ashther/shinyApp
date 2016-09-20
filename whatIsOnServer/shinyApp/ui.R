@@ -154,7 +154,7 @@ shinyUI(dashboardPage(
               tags$div(title = 'app_start_city'),
               selectizeInput('app_start_city',
                              '选择城市',
-                             choices = city_location$city,
+                             choices = unique(city_location$city),
                              selected = '西安市'),
               width = NULL,
               solidHeader = TRUE
@@ -193,9 +193,10 @@ shinyUI(dashboardPage(
               solidHeader = TRUE
             ),
 
-            p(helpText('对登录次数前10的地区统计仅供参考，
-                     当用户位于相邻城市如西安与咸阳交界处时，
-                     用户可能基于距离而非行政区域被划分至不同城市。'),
+            p(helpText('对登录次数前10的地区统计基于百度地图API服务，
+                       由于采用定时增量计算的方式，当天在非中国大陆地区以及
+                       其他冷僻地点（如西藏等）的登录可能会被划入其他城市，对于
+                       当天之前的地区统计是100%正确的。'),
               style = 'font-size:85%'),
 
             uiOutput('specific_user_geo_ui')
@@ -304,7 +305,7 @@ shinyUI(dashboardPage(
         tabName = 'channel', 
         
           fluidRow(
-
+            
             #　第一列
             column(
               width = 9,
@@ -312,15 +313,15 @@ shinyUI(dashboardPage(
                 # 第一列中的第一行第一列，渠道来源
                 column(
                   width = 6,
-                  box(plotlyOutput('channel'),
+                  box(plotlyOutput('versionCode'),
                       width = NULL,
                       solidHeader = TRUE)
-                ),
+                ), 
 
                 # 第一列中第一行第二列，版本
                 column(
                   width = 6,
-                  box(plotlyOutput('versionCode'),
+                  box(plotlyOutput('channelplot'),
                       width = NULL,
                       solidHeader = TRUE)
                 )

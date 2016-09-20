@@ -49,3 +49,5 @@ Temporary Items
 *.csv
 *xlsx
 *.cnf
+*.rda
+.Rproj.user

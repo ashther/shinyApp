@@ -229,7 +229,7 @@ shinyServer(function(input, output, session) {
         city_location$city[
           which.min(
             sqrt(
-              (app_start_data()$lon[x] - city_location$lng) ^ 2 + 
+              (app_start_data()$lon[x] - city_location$lon) ^ 2 + 
                 (app_start_data()$lat[x] - city_location$lat) ^ 2
             )
           )

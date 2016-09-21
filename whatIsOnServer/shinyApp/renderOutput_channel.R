@@ -9,7 +9,7 @@ output$versionCode <- renderPlotly({
           orientation = 'h') %>% 
     layout(title = '统计期内各版本用户数', 
            xaxis = list(title = '用户数'), 
-           yaxis = list(title = '版本号'), 
+           yaxis = list(title = '版本号', type = 'category'), 
            magrin = list(l = 200))
 })
 
@@ -55,5 +55,5 @@ output$channel_version_heatmap <- renderPlotly({
           type = 'heatmap') %>% 
     layout(title = '统计期内各渠道及版本用户数情况', 
            xaxis = list(title = '渠道'), 
-           yaxis = list(title = '版本号'))
+           yaxis = list(title = '版本号', type = 'category'))
 })

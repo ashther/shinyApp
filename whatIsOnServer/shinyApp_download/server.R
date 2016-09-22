@@ -1,6 +1,7 @@
 library(ggplot2)
 library(RMySQL)
 library(dplyr)
+library(shinyStore)
 source('www/dataSource.R')
 
 logged <- FALSE
@@ -8,6 +9,16 @@ logged <- FALSE
 shinyServer(function(input, output, session) {
   
   login_data <- reactiveValues(logged = logged)
+  
+  # output$test <- renderPrint({
+  #   cat(
+  #     'time_stamp: ', input$store$time_stamp, '\n',
+  #     'sys.time: ', as.character(Sys.time()), '\n',
+  #     'username: ', input$store$user_name, '\n',
+  #     'password: ', input$store$passwd, '\n',
+  #     'test_value: ', is.null(input$store$test_value)
+  #   )
+  # })
   
   source('www/login.R', encoding = 'utf-8', local = TRUE)
   

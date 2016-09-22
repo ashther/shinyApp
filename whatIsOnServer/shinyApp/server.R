@@ -1,4 +1,4 @@
-
+library(shinyStore)
 logged <- FALSE
 
 shinyServer(function(input, output, session) {

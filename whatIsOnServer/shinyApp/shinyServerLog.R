@@ -4,7 +4,9 @@ con <- dbConnect(MySQL(), host = host, port = port,
                  dbname = dbname)
 
 log_data <- reactive({
-  return(c(input$user_name, 
+  return(c(ifelse(!is.null(input$user_name), 
+                  input$user_name, 
+                  input$store$user_name), 
            session$clientData$url_hostname, 
            session$clientData$url_pathname, 
            session$clientData$url_port, 

@@ -1,6 +1,8 @@
-
+library(shinyStore)
 
 shinyUI(bootstrapPage(
+  
+    initStore('store', 'shinyApp_download'), 
     
     tags$link(rel = 'stylesheet', type = 'text/css', href = 'style.css'), 
     tags$style(type = 'text/css', '#helptext_ui {color: rgba(0, 0, 0, 0.3);}'), 

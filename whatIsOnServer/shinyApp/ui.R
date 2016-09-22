@@ -6,8 +6,10 @@ library(leaflet)
 library(ggplot2)
 library(plotly)
 library(digest)
+library(shinyStore)
 
 shinyUI(dashboardPage(
+  
   skin = 'black', 
   
   dashboardHeader(title = '数据分析'), 
@@ -15,6 +17,8 @@ shinyUI(dashboardPage(
   dashboardSidebar(
     
     sidebarMenu(
+      
+      initStore('store', 'shinyApp'), 
       
       menuItem('用户规模及质量', 
            tabName = 'login', 

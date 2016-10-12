@@ -8,10 +8,8 @@ shinyServer(function(input, output, session) {
   
   observe({
     if (login_check$logged == TRUE) {
-      output$test <- renderPrint({
-        'ok'
-      })
-      
+      source('renderUI.R', local = TRUE)
+      source('renderOutput.R', local = TRUE)
     }
   })
 })

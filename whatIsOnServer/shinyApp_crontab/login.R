@@ -2,7 +2,7 @@
 output$uiLogin <- renderUI({
   
   if (!is.null(input$store$time_stamp)) {
-    if (difftime(Sys.time(), input$store$time_stamp, units = 'hours') <= 24) {
+    if (difftime(Sys.time(), input$store$time_stamp, units = 'secs') <= 1) {
       if (nrow(user_passwd[
         user_passwd$user == input$store$user_name &
         user_passwd$passwd == digest::digest(input$store$passwd, algo = 'xxhash64', seed = 622) &

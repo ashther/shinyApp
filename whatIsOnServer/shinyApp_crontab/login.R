@@ -10,7 +10,6 @@ output$uiLogin <- renderUI({
         ]) > 0) {
         
         login_check$logged <- TRUE
-        
       }
     }
   }
@@ -47,3 +46,17 @@ output$pass <- renderText({
     }
 })
 
+output$superUser <- reactive({
+  if (!is.null(input$user_name)) {
+    if (input$user_name == 'sunlj') {
+      return(TRUE)
+    }
+  } else if (!is.null(input$store$user_name)) {
+    if (input$store$user_name == 'sunlj') {
+      return(TRUE)
+    }
+  } else {
+    return(FALSE)
+  }
+})
+outputOptions(output, 'superUser', suspendWhenHidden = FALSE)

@@ -1,8 +1,11 @@
 output$ui <- renderUI({
   
   mainPanel(
+    # verbatimTextOutput('test'), 
     tabsetPanel(
       tabPanel(
+        
+        # ====================== schedule ==========================
         'schedule', 
         tableOutput('result_table_schedule'), 
         plotlyOutput('result_plot_schedule'), 
@@ -10,8 +13,15 @@ output$ui <- renderUI({
         
         hr(),
         
-        actionButton('refresh_arg_schedule', '修改参数'), 
-        conditionalPanel('input.refresh_arg_schedule', htmlOutput('con_but1_schedule')),
+        conditionalPanel(
+          "output.superUser == 1", 
+          actionButton('refresh_arg_schedule', 
+                       '修改参数', 
+                       icon = icon('warning'), 
+                       style = 'color: #fff; background-color: #ff0000;')
+        ), 
+        htmlOutput('con_button_arg_schedule'), 
+        
         br(), 
         fluidRow(
           column(
@@ -50,8 +60,16 @@ output$ui <- renderUI({
         ), 
         
         hr(), 
-        actionButton('refresh_cron_schedule', '修改定时'), 
-        conditionalPanel('input.refresh_cron_schedule', htmlOutput('con_but2_schedule')), 
+        
+        conditionalPanel(
+          "output.superUser == 1", 
+          actionButton('refresh_cron_schedule', 
+                       '修改定时', 
+                       icon = icon('warning'), 
+                       style = 'color: #fff; background-color: #ff0000;')
+        ), 
+        htmlOutput('con_button_cron_schedule'), 
+        
         br(),
         fluidRow(
           column(width = 2, textInput('cron_M_schedule', '分', 
@@ -68,8 +86,87 @@ output$ui <- renderUI({
       ), 
       
       tabPanel(
+        
+        # ====================== stone ==========================
         'stone', 
-        verbatimTextOutput('SOME')
+        tableOutput('result_table_stone'), 
+        plotlyOutput('result_plot_stone'), 
+        verbatimTextOutput('log_stone'), 
+        
+        hr(),
+        
+        conditionalPanel(
+          "output.superUser == 1", 
+          actionButton('refresh_arg_stone', 
+                       '修改参数', 
+                       icon = icon('warning'), 
+                       style = 'color: #fff; background-color: #ff0000;')
+        ), 
+        htmlOutput('con_button_arg_stone'), 
+        
+        br(), 
+        fluidRow(
+          column(
+            width = 4, 
+            textInput('stone_arg_stopwords', '停止词', 
+                      value = arg_stone$value[arg_stone$arg == 'stopwords']), 
+            textInput('stone_arg_topn', '关键词数量', 
+                      value = arg_stone$value[arg_stone$arg == 'topn'])
+          ), 
+          column(
+            width = 4, 
+            textInput('stone_arg_resp_weight', '岗位职责权重', 
+                      value = arg_stone$value[arg_stone$arg == 'resp_weight']), 
+            textInput('stone_arg_reqr_weight', '任职要求权重', 
+                      value = arg_stone$value[arg_stone$arg == 'reqr_weight'])
+          ), 
+          column(
+            width = 4, 
+            textInput('stone_arg_create_idf', '是否新建idf文件', 
+                      value = arg_stone$value[arg_stone$arg == 'create_idf'])
+          )
+        ), 
+        
+        hr(), 
+        
+        conditionalPanel(
+          "output.superUser == 1", 
+          actionButton('refresh_cron_stone', 
+                       '修改定时', 
+                       icon = icon('warning'), 
+                       style = 'color: #fff; background-color: #ff0000;')
+        ), 
+        htmlOutput('con_button_cron_stone'), 
+        
+        br(),
+        fluidRow(
+          column(width = 2, textInput('cron_M_schedule', '分', 
+                                      value = crontab_stone$time['M'])),
+          column(width = 2, textInput('cron_H_schedule', '时', 
+                                      value = crontab_stone$time['H'])), 
+          column(width = 2, textInput('cron_md_schedule', '日', 
+                                      value = crontab_stone$time['md'])), 
+          column(width = 2, textInput('cron_m_schedule', '月', 
+                                      value = crontab_stone$time['m'])), 
+          column(width = 2, textInput('cron_wd_schedule', '周天', 
+                                      value = crontab_stone$time['wd']))
+        )
+      ), 
+      
+      tabPanel(
+        
+        # ====================== friend ==========================
+        'friend', 
+        tableOutput('result_table_friend'), 
+        plotlyOutput('result_plot_friend')
+      ), 
+      
+      tabPanel(
+        
+        # ====================== circle ==========================
+        'circle', 
+        tableOutput('result_table_circle'), 
+        plotlyOutput('result_plot_circle')
       )
     )
   )

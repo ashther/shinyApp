@@ -6,9 +6,12 @@ library(digest)
 library(plotly)
 library(shinyStore)
 logged <- FALSE
-schedule_arg_path <- paste0("/home/r/recommend/schedule/", 'parameters.cnf')
-stone_arg_path <- paste0("/home/r/recommend/stone/", 'parameters.cnf')
+
+schedule_arg_path <- "/home/r/recommend/schedule/parameters.cnf"
+stone_arg_path <- "/home/r/recommend/stone/parameters.cnf"
 crontab_bak_path <- "/home/r/temp/crontab.bak"
+
+# =============================== function ===============================
 
 simplePlot <- function(df, x, y) {
   plot_ly(df, 
@@ -79,8 +82,18 @@ cronWrite <- function(df, crontab, file_path) {
   con <- file(file_path)
   writeLines(crontab, con)
   close(con)
-  system(sprintf("crontab %s", file_path))
+  system(sprintf("sudo -S crontab -u r %s", file_path), 
+         input = '123456')
 }
+
+myMessage <- function() {
+  renderText({
+    sprintf("<font color=\'#FF0000\'><b> 已修改，修改时间：%s </b></font>", 
+            Sys.time())
+  })
+}
+
+# =============================== fetch data ===============================
 
 con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306, 
                  username = 'r', password = '123456', 
@@ -108,12 +121,7 @@ rec_log_plot <- rec_log %>%
             item_n = mean(item_n, na.rm = TRUE), 
             update_time = mean(as.numeric(update_time), na.rm = TRUE))
 
-arg_schedule <- argParse(schedule_arg_path)
-arg_stone <- argParse(stone_arg_path)
-
-crontab <- readLines(crontab_bak_path)
-crontab_schedule <- cronParse(crontab, '/schedule/')
-crontab_stone <- cronParse(crontab, '/stone/')
+# =============================== fetch log ===============================
 
 log_schedule <- system("tail /home/r/recommend/schedule/schedule.log", intern = TRUE)
 log_stone <- system("tail /home/r/recommend/stone/stone.log", intern = TRUE)

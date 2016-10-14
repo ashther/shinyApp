@@ -1,6 +1,6 @@
 
 
-shinyUI(fluidPage(
+shinyUI(fluidPage(theme = shinytheme('lumen'), 
   
   initStore('store', 'shinyApp_download'), 
   
@@ -9,5 +9,10 @@ shinyUI(fluidPage(
       textOutput("pass")
   ),
   
-  uiOutput('ui')
+  uiOutput('sidebarPanel'),
+  
+  mainPanel(
+    uiOutput('mainPanel')
+  )
+  
 ))

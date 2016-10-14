@@ -5,6 +5,7 @@ library(magrittr)
 library(digest)
 library(plotly)
 library(shinyStore)
+library(shinythemes)
 logged <- FALSE
 
 schedule_arg_path <- "/home/r/recommend/schedule/parameters.cnf"
@@ -56,9 +57,18 @@ argWrite <- function(df, file_path) {
   paste(df$arg, df$value, sep = ' <- ') %>% 
     writeLines(con)
   close(con)
+  return(0)
+}
+
+cronGet <- function() {
+  system("sudo -S crontab -u r -l", input = '123456', intern = TRUE)
 }
 
 cronParse <- function(crontab, pattern) {
+  if (length(crontab) == 0) {
+    return(list(id_crontab = NULL, time = NULL, command = NULL))
+  }
+  
   id_crontab <- which(grepl(pattern, crontab))
   sep_position <- '*\\s*\\s*\\s*\\s*\\s' %>% 
     gregexpr(crontab[id_crontab]) %>% 
@@ -66,8 +76,7 @@ cronParse <- function(crontab, pattern) {
     extract(5)
   time <- substr(crontab[id_crontab], 1, sep_position - 1) %>% 
     strsplit(' ') %>% 
-    unlist(use.names = FALSE) %>% 
-    set_names(c('M', 'H', 'md', 'm', 'wd'))
+    unlist(use.names = FALSE)
   command <- substr(crontab[id_crontab], sep_position + 1, nchar(crontab[id_crontab]))
 
   return(list(id_crontab = id_crontab, 
@@ -82,14 +91,23 @@ cronWrite <- function(df, crontab, file_path) {
   con <- file(file_path)
   writeLines(crontab, con)
   close(con)
-  system(sprintf("sudo -S crontab -u r %s", file_path), 
-         input = '123456')
+  
+  result <- system(sprintf("sudo -S crontab -u r %s", 
+                           file_path), 
+                   input = '123456', 
+                   ignore.stdout = TRUE, 
+                   ignore.stderr = TRUE)
+  return(result)
 }
 
-myMessage <- function() {
+# status: 0 = success, 1 = failed, -1 = start
+myMessage <- function(status) {
   renderText({
-    sprintf("<font color=\'#FF0000\'><b> 已修改，修改时间：%s </b></font>", 
-            Sys.time())
+    if (status == 0) {
+      sprintf("<font color=\'#FF0000\'><b> 已修改，修改时间：%s </b></font>", Sys.time())
+    } else {
+      sprintf("<font color=\'#FF0000\'><b> 修改失败 %s </b></font>", Sys.time())
+    }
   })
 }
 
@@ -125,3 +143,5 @@ rec_log_plot <- rec_log %>%
 
 log_schedule <- system("tail /home/r/recommend/schedule/schedule.log", intern = TRUE)
 log_stone <- system("tail /home/r/recommend/stone/stone.log", intern = TRUE)
+
+

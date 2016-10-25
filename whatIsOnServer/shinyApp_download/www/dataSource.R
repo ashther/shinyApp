@@ -2,12 +2,11 @@ dataSource_filename <- paste0('dataSource_', format(Sys.Date(), '%Y%m%d'), '.rda
 
 if (!file.exists(dataSource_filename)) {
   
-  eval(parse(file = 'www/config.cnf'))
+  eval(parse(file = '/srv/shiny-server/download/www/config.cnf'))
   
-  con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306,
-                   username = 'r', password = '123456',
+  con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306, 
+                   username = 'r', password = '123456', 
                    dbname = 'shiny_data')
-  dbSendQuery(con, 'set names gbk')
   
   res <- dbSendQuery(con, 
                      "SELECT field, 
@@ -37,7 +36,6 @@ if (!file.exists(dataSource_filename)) {
     con_app <- dbConnect(MySQL(), host = host, port = port, 
                          username = username, password = password, 
                          dbname = dbname)
-    dbSendQuery(con_app, 'set names gbk')
     
     res <- dbSendQuery(con_app, 
                        paste0(
@@ -46,7 +44,7 @@ if (!file.exists(dataSource_filename)) {
                          a.username  AS '手机号' , 
                          a.regist_time AS '注册时间'
                          FROM   yz_sys_db.ps_account AS a 
-                         LEFT JOIN yz_app_person_db.ps_attribute_variety AS b 
+                         LEFT JOIN yz_app_person_db.ps_attribute AS b 
                          ON a.id = b.account_id 
                          AND b.del_status = 0 
                          WHERE  a.id >= 20000 
@@ -68,7 +66,6 @@ if (!file.exists(dataSource_filename)) {
     con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306, 
                      username = 'r', password = '123456', 
                      dbname = 'shiny_data')
-    dbSendQuery(con, 'set names gbk')
     
     res <- dbSendQuery(con, 
                        paste0(
@@ -136,7 +133,6 @@ if (!file.exists(dataSource_filename)) {
     con <- dbConnect(MySQL(), host = '10.21.3.101', port = 3306, 
                      username = 'r', password = '123456', 
                      dbname = 'yz_sys_db')
-    dbSendQuery(con, 'set names gbk')
     res <- dbSendQuery(con, 
                        "SELECT account_id, 
                      DATE_FORMAT(login_time, '%Y-%m-%d %H:%i:00') AS login_time 

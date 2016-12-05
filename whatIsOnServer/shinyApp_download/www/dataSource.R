@@ -97,6 +97,7 @@ if (!file.exists(dataSource_filename)) {
                          WHEN 'A011' THEN '联想'
                          WHEN 'A012' THEN 'vivo'
                          WHEN 'A013' THEN '三星'
+                         WHEN 'A014' THEN 'pp助手'
                          WHEN 'appstore' THEN '苹果' 
                          ELSE app_channel_id 
                          END AS app_channel_id 
